@@ -1,8 +1,8 @@
 String dataDir    = "../data/";
 OPC opc;
 
-int canvasWidth   = 55;
-int canvasHeight  = 19;
+int canvasWidth   = 55*10;
+int canvasHeight  = 19*10; //// 19
 
 
 float noiseIncrement = 0.25;  /// CHANGE SIZE OF GRANUAL
@@ -12,9 +12,10 @@ float xoffStart = 90.0;
 OpenSimplexNoise noise;
 
 PImage solarSurface;
-PImage sunspotColor;
+PImage spotColor;
+PImage plageColor;
 
-ArrayList<Sunspot> sunspots;
+ArrayList<SolarFeature> solarFeatures;
 
 void settings(){
   size(canvasWidth, canvasHeight);
@@ -22,41 +23,43 @@ void settings(){
 }
 
 void setup(){
-  // blendMode(REPLACE);  //// FOR BLENDING OF THE SUNSPOTS WITH THE SURFACE
+  // blendMode(DARKEST);  //// FOR BLENDING OF THE FEATURES WITH THE SURFACE
 
   opc = new OPC(this, "127.0.0.1", 7890);  // Connect to the local instance of fcserver
   opc.ledGrid(0, 54, 18, width/2, height/2, width/width, height/height, 0, false, false); // Create LED Grid
-  
+
   noStroke();
   noFill();
 
   noise         = new OpenSimplexNoise();
-  sunspots      = new ArrayList<Sunspot>();
+  solarFeatures = new ArrayList<SolarFeature>();
   solarSurface  = loadImage(dataDir + "solarSurface.png");
-  sunspotColor  = loadImage(dataDir + "sunspot.png");
+  spotColor  = loadImage(dataDir + "sunspot.png");
+  plageColor    = loadImage(dataDir + "plage.png");
+
 }
 
 void draw() {
   drawSurface();
-  drawSunspots();
+  drawFeatures();
 }
 
 
 void mousePressed(){
   int spotDensity = 4; //// MAKING MULTIPLE SPOTS ON TOP OF EACH OTHER MAKES A NICE FADING EFFECT
     for (int s = 0; s < spotDensity; s++){
-      sunspots.add(new Sunspot(mouseX, mouseY));
+      solarFeatures.add(new SolarFeature(mouseX, mouseY, SPOT));
   }
 }
 
 
-void drawSunspots(){
-  if (sunspots.size() > 0){
-    for (int i = 0; i < sunspots.size(); i++){
-      sunspots.get(i).show();
-      sunspots.get(i).update();
-      if (sunspots.get(i).currentSize <= 0){
-        sunspots.remove(i);
+void drawFeatures(){
+  if (solarFeatures.size() > 0){
+    for (int i = 0; i < solarFeatures.size(); i++){
+      solarFeatures.get(i).show();
+      solarFeatures.get(i).update();
+      if (solarFeatures.get(i).currentSize <= 0){
+        solarFeatures.remove(i);
       }
     }
   }
