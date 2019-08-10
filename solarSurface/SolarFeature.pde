@@ -1,9 +1,8 @@
 class SolarFeature{
   PShape  featureShape;
+  PVector pos = new PVector(0,0);
 
   int     type;
-  int     xPos;
-  int     yPos;
   int     age = 0;                          //// CURRENT LIFETIME OF THIS FEATURE (IN FPS)
 
   float   lifeSpan = 5 * frameRate;       //// NUM OF SECONDS * FPS TO KEEP FEATURE AT MAX OPACITY (ASSUMING ~60FPS)
@@ -16,18 +15,12 @@ class SolarFeature{
   color   featureColor;
 
   SolarFeature(int x, int y, int type){
-    type = type;
-    xPos = x;
-    yPos = y;
-    makeSpotShape();
-  }
+    pos.x = x;
+    pos.y = y;
 
-  void makePlageShape(int length){
-    PVector[] plagePoints = new PVector[0];
-
-    //// MAKE ARRAY OF VECTORS
-    //// VECTOR VALUES ARE RANDOM GAAUSSIAN AROUND MIDDLE OF FRAME
-    //// ITERATE THROUGH VECTORS AND CHANGE COLOR VALUES OF PIXELS WITHIN A CERTAIN DISTANCE OF THEM
+    if (type == 0){
+      makeSpotShape();
+    }
   }
 
   void makeSpotShape(){
@@ -54,13 +47,11 @@ class SolarFeature{
     showSpots();
   }
 
-
   void showSpots(){
-
     pushMatrix();
       fill(color(46, 1, 4, 64));              //// color(46, 1, 4) = DARK RED-ISH
       // fill(color(250, 234, 206, 64));            //// color(250, 234, 206) = BRIGHT YELLOW-ISH
-      translate(xPos, yPos);                     //// PLACE UNDER MOUSE (OR WHEREVER xPos/yPos HAS BEEN SET)
+      translate(pos.x, pos.y);                     //// PLACE UNDER MOUSE (OR WHEREVER pos.x/pos.y HAS BEEN SET)
       shape(featureShape);
       featureShape.scale(2);                     //// DOUBLE SHAPE SIZE
       shape(featureShape);

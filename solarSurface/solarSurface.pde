@@ -1,9 +1,8 @@
 String dataDir    = "../data/";
 OPC opc;
 
-int canvasWidth   = 55*10;
+int canvasWidth   = 55*10; //// 55
 int canvasHeight  = 19*10; //// 19
-
 
 float noiseIncrement = 0.25;  /// CHANGE SIZE OF GRANUAL
 float zoff = 0.0;
@@ -19,7 +18,6 @@ ArrayList<SolarFeature> solarFeatures;
 
 void settings(){
   size(canvasWidth, canvasHeight);
-
 }
 
 void setup(){
@@ -34,7 +32,7 @@ void setup(){
   noise         = new OpenSimplexNoise();
   solarFeatures = new ArrayList<SolarFeature>();
   solarSurface  = loadImage(dataDir + "solarSurface.png");
-  spotColor  = loadImage(dataDir + "sunspot.png");
+  spotColor     = loadImage(dataDir + "sunspot.png");
   plageColor    = loadImage(dataDir + "plage.png");
 
 }
@@ -48,7 +46,9 @@ void draw() {
 void mousePressed(){
   int spotDensity = 4; //// MAKING MULTIPLE SPOTS ON TOP OF EACH OTHER MAKES A NICE FADING EFFECT
     for (int s = 0; s < spotDensity; s++){
-      solarFeatures.add(new SolarFeature(mouseX, mouseY, SPOT));
+      //// 0 == SPOT  /   1 == PLAGE
+      // solarFeatures.add(new SolarFeature(mouseX, mouseY, 0));
+      solarFeatures.add(new SolarFeature(mouseX, mouseY, 0));
   }
 }
 
@@ -56,11 +56,17 @@ void mousePressed(){
 void drawFeatures(){
   if (solarFeatures.size() > 0){
     for (int i = 0; i < solarFeatures.size(); i++){
+
+    if (solarFeatures.get(i).type == 0) {
       solarFeatures.get(i).show();
       solarFeatures.get(i).update();
       if (solarFeatures.get(i).currentSize <= 0){
-        solarFeatures.remove(i);
+        solarFeatures.remove(i);  //// REMOVE OLDER SUN SPOTS
       }
+    }
+    else if (solarFeatures.get(i).type == 1) {
+
+    }
     }
   }
 }
@@ -79,8 +85,21 @@ void drawSurface(){
       yoff += noiseIncrement;
 
       float n = (float) noise.eval(xoff, yoff, zoff);
-      int colorPos = round(map(n, -1, 1, 0, solarSurface.width));
-      pixels[x+y*width] = color(solarSurface.get(colorPos, 0));
+
+      int colorPos;
+      PImage colorField;
+
+      // if (dist(x,y, x, height/2) < 10){
+      //   colorField = plageColor;
+      // }
+      // else{
+        colorField = solarSurface;
+      // }
+
+      colorPos = round(map(n, -1, 1, 0, colorField.width));
+      pixels[x+y*width] = color(colorField.get(colorPos, 0));
+
+
     }
   }
   updatePixels();
