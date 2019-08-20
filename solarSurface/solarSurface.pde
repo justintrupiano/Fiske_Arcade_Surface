@@ -1,8 +1,8 @@
 String dataDir    = "../data/";
 OPC opc;
 
-int canvasWidth   = 55*10; //// 55
-int canvasHeight  = 19*10; //// 19
+int canvasWidth   = 55; //// 55
+int canvasHeight  = 91; //// 19
 
 float noiseIncrement = 0.25;  /// CHANGE SIZE OF GRANUAL
 float zoff = 0.0;
@@ -24,7 +24,7 @@ void setup(){
   // blendMode(DARKEST);  //// FOR BLENDING OF THE FEATURES WITH THE SURFACE
 
   opc = new OPC(this, "127.0.0.1", 7890);  // Connect to the local instance of fcserver
-  opc.ledGrid(0, 54, 18, width/2, height/2, width/width, height/height, 0, false, false); // Create LED Grid
+  opc.ledGrid(0, 54, 90, width/2, height/2, width/width, height/height, 0, false, false); // Create LED Grid
 
   noStroke();
   noFill();
