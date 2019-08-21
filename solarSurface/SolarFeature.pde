@@ -7,10 +7,12 @@ class SolarFeature{
 
   float   lifeSpan = 5 * frameRate;       //// NUM OF SECONDS * FPS TO KEEP FEATURE AT MAX OPACITY (ASSUMING ~60FPS)
   float   currentSize = 0;
-  float   maxSize = random(canvasWidth*0.001, canvasWidth*0.1);  //// MAX SIZE OF FEATURE (10% OF CANVAS WIDTH)
+  //float   maxSize = random(canvasWidth*0.001, canvasWidth*0.1);  //// MAX SIZE OF FEATURE (10% OF CANVAS WIDTH)
+  float maxSize = canvasWidth * 0.1;
+  //float maxSize = 10; 
   float   perlinSeed = random(100);
-  float   increment = maxSize*0.005;
-  float   flux = 10;
+  float   increment = maxSize*0.05;
+  float   flux = 5;
 
   color   featureColor;
 
@@ -49,7 +51,7 @@ class SolarFeature{
 
   void showSpots(){
     pushMatrix();
-      fill(color(46, 1, 4, 64));              //// color(46, 1, 4) = DARK RED-ISH
+      fill(color(46, 1, 4, 128));              //// color(46, 1, 4) = DARK RED-ISH
       // fill(color(250, 234, 206, 64));            //// color(250, 234, 206) = BRIGHT YELLOW-ISH
       translate(pos.x, pos.y);                     //// PLACE UNDER MOUSE (OR WHEREVER pos.x/pos.y HAS BEEN SET)
       shape(featureShape);

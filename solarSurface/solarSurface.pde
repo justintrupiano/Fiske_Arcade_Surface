@@ -44,7 +44,7 @@ void draw() {
 
 
 void mousePressed(){
-  int spotDensity = 4; //// MAKING MULTIPLE SPOTS ON TOP OF EACH OTHER MAKES A NICE FADING EFFECT
+  int spotDensity = 1; //// MAKING MULTIPLE SPOTS ON TOP OF EACH OTHER MAKES A NICE FADING EFFECT
     for (int s = 0; s < spotDensity; s++){
       //// 0 == SPOT  /   1 == PLAGE
       // solarFeatures.add(new SolarFeature(mouseX, mouseY, 0));
@@ -76,7 +76,7 @@ void drawSurface(){
   loadPixels();
   float xoff = xoffStart;
   xoffStart -= 0.01;              /// ADJUST SPEED OF LEFT-RIGHT FLOW
-  zoff += 0.025;                  /// ADJUST SPEED OF 3D FLOW
+  zoff += 0.05;                  /// ADJUST SPEED OF 3D FLOW
 
   for (int x = 0; x < width; x++) {
     xoff += noiseIncrement;
