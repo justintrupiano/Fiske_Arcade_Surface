@@ -20,9 +20,12 @@ public class solarSurface extends PApplet {
 String dataDir    = "../data/";
 OPC opc;
 
-int canvasWidth   = 55*10;
-int canvasHeight  = 19*10; //// 19
+PImage solarSurface;
+PImage spotColor;
 
+int canvasWidth   = 55; //// 55
+int canvasHeight  = 91; //// 19
+int maxNumFeatures = 100;
 
 float noiseIncrement = 0.25f;  /// CHANGE SIZE OF GRANUAL
 float zoff = 0.0f;
@@ -30,31 +33,54 @@ float xoffStart = 90.0f;
 
 OpenSimplexNoise noise;
 
-PImage solarSurface;
-PImage spotColor;
-PImage plageColor;
+// PImage plageColor;
 
 ArrayList<SolarFeature> solarFeatures;
 
+PVector[] arches = new PVector[12];
+
+
 public void settings(){
   size(canvasWidth, canvasHeight);
-
 }
 
 public void setup(){
   // blendMode(DARKEST);  //// FOR BLENDING OF THE FEATURES WITH THE SURFACE
+  // frameRate(5);
 
   opc = new OPC(this, "127.0.0.1", 7890);  // Connect to the local instance of fcserver
-  opc.ledGrid(0, 54, 18, width/2, height/2, width/width, height/height, 0, false, false); // Create LED Grid
+  opc.ledGrid(0, 54, 90, width/2, height/2, width/width, height/height, 0, false, false); // Create LED Grid
 
   noStroke();
-  noFill();
 
   noise         = new OpenSimplexNoise();
   solarFeatures = new ArrayList<SolarFeature>();
   solarSurface  = loadImage(dataDir + "solarSurface.png");
-  spotColor  = loadImage(dataDir + "sunspot.png");
-  plageColor    = loadImage(dataDir + "plage.png");
+  spotColor     = loadImage(dataDir + "sunspot.png");
+  // plageColor    = loadImage(dataDir + "plage.png");
+
+
+  ///////////// HARD CODE POS OF ARCHES /////////////
+  arches[0] = new PVector(0, 0);
+  arches[1] = new PVector(0, 55);
+
+  arches[2] = new PVector(18, 0);
+  arches[3] = new PVector(18,55);
+
+  arches[4] = new PVector(36, 0);
+  arches[5] = new PVector(36,55);
+
+  arches[6] = new PVector(54, 0);
+  arches[7] = new PVector(54,55);
+
+  arches[8] = new PVector(72, 0);
+  arches[9] = new PVector(72,55);
+
+  arches[10] = new PVector(91, 0);
+  arches[11] = new PVector(91,55);
+  ///////////////////////////////////
+
+
 
 }
 
@@ -65,9 +91,10 @@ public void draw() {
 
 
 public void mousePressed(){
-  int spotDensity = 4; //// MAKING MULTIPLE SPOTS ON TOP OF EACH OTHER MAKES A NICE FADING EFFECT
-    for (int s = 0; s < spotDensity; s++){
-      solarFeatures.add(new SolarFeature(mouseX, mouseY, SPOT));
+    if (solarFeatures.size() < maxNumFeatures){
+      //// 0 == SPOT  /   1 == PLAGE
+      // solarFeatures.add(new SolarFeature(mouseX, mouseY, 0));
+      solarFeatures.add(new SolarFeature(mouseX, mouseY, 0));
   }
 }
 
@@ -75,13 +102,28 @@ public void mousePressed(){
 public void drawFeatures(){
   if (solarFeatures.size() > 0){
     for (int i = 0; i < solarFeatures.size(); i++){
+
+    if (solarFeatures.get(i).type == 0) {
       solarFeatures.get(i).show();
       solarFeatures.get(i).update();
-      if (solarFeatures.get(i).currentSize <= 0){
-        solarFeatures.remove(i);
-      }
+
     }
+    // else if (solarFeatures.get(i).type == 1) {
+    //
+    // }
+    }
+
+    for (int i = 0; i < solarFeatures.size(); i++){
+
+      if (solarFeatures.get(i).currentSize < 0){
+        solarFeatures.remove(i);  //// REMOVE OLDER SUN SPOTS
+      }
   }
+
+  }
+
+
+
 }
 
 
@@ -89,7 +131,7 @@ public void drawSurface(){
   loadPixels();
   float xoff = xoffStart;
   xoffStart -= 0.01f;              /// ADJUST SPEED OF LEFT-RIGHT FLOW
-  zoff += 0.025f;                  /// ADJUST SPEED OF 3D FLOW
+  zoff += 0.05f;                  /// ADJUST SPEED OF 3D FLOW
 
   for (int x = 0; x < width; x++) {
     xoff += noiseIncrement;
@@ -98,8 +140,21 @@ public void drawSurface(){
       yoff += noiseIncrement;
 
       float n = (float) noise.eval(xoff, yoff, zoff);
-      int colorPos = round(map(n, -1, 1, 0, solarSurface.width));
-      pixels[x+y*width] = color(solarSurface.get(colorPos, 0));
+
+      int colorPos;
+      PImage colorField;
+
+      // if (dist(x,y, x, height/2) < 10){
+      //   colorField = plageColor;
+      // }
+      // else{
+        colorField = solarSurface;
+      // }
+
+      colorPos = round(map(n, -1, 1, 0, colorField.width));
+      pixels[x+y*width] = color(colorField.get(colorPos, 0));
+
+
     }
   }
   updatePixels();
@@ -477,87 +532,126 @@ public class OPC implements Runnable
   }
 }
 class SolarFeature{
-  PShape  featureShape;
+  PShape  outsideShape;
+  PShape  insideShape;
+
+  PVector pos = new PVector(0, 0);
+  PVector vel = new PVector(0, 0);
+  PVector acc = new PVector(0, 0);
+
+  int dest = round(random(0, 11));
 
   int     type;
-  int     xPos;
-  int     yPos;
   int     age = 0;                          //// CURRENT LIFETIME OF THIS FEATURE (IN FPS)
+  int     outsideOpacity = 64;
+  int     insideOpacity = 200;
 
   float   lifeSpan = 5 * frameRate;       //// NUM OF SECONDS * FPS TO KEEP FEATURE AT MAX OPACITY (ASSUMING ~60FPS)
   float   currentSize = 0;
-  float   maxSize = random(canvasWidth*0.001f, canvasWidth*0.1f);  //// MAX SIZE OF FEATURE (10% OF CANVAS WIDTH)
+  float   maxSize = random(canvasWidth*0.01f, canvasWidth*0.2f);  //// MAX SIZE OF FEATURE (10% OF CANVAS WIDTH)
   float   perlinSeed = random(100);
-  float   increment = maxSize*0.005f;
-  float   flux = 10;
+  float   increment;
+  float   flux = 0.75f;
+
+  boolean maxed = false;
 
   int   featureColor;
 
+
+
   SolarFeature(int x, int y, int type){
-    type = type;
-    xPos = x;
-    yPos = y;
-    makeSpotShape();
-  }
+    pos.x = x;
+    pos.y = y;
 
-  public void makePlageShape(int length){
-    PVector[] plagePoints = new PVector[0];
-
-    //// MAKE ARRAY OF VECTORS
-    //// VECTOR VALUES ARE RANDOM GAAUSSIAN AROUND MIDDLE OF FRAME
-    //// ITERATE THROUGH VECTORS AND CHANGE COLOR VALUES OF PIXELS WITHIN A CERTAIN DISTANCE OF THEM
-  }
-
-  public void makeSpotShape(){
-    perlinSeed += 0.025f;                                  //// SPEED OF FLUX WITHIN FEATURE
-    featureShape = createShape();
-    featureShape.beginShape();
-
-    for (float v = 0; v < TWO_PI; v+=0.025f){
-        float xoff = map(cos(v)+perlinSeed, -1, 1, 1, 3); //// JAGGEDNESS OF EDGES (HIGHER = MORE JAGGED)
-        float yoff = map(sin(v)+perlinSeed, -1, 1, 1, 3); //// JAGGEDNESS OF EDGES (HIGHER = MORE JAGGED)
-
-        //// MOVING THROUGH NOISE SPACE:
-        float n = map((float) (noise.eval(xoff, yoff)), -1, 1, 0, 1);
-        float r = map(n, 0, 1, constrain(currentSize - flux, 0, currentSize), currentSize);
-
-        float vX = r * cos(v);
-        float vY = r * sin(v);
-        featureShape.vertex(vX, vY);
+    if (type == 0){
+      makeSpotShape();
     }
-    featureShape.endShape(CLOSE);
+
   }
 
   public void show(){
     showSpots();
   }
 
+  public void makeSpotShape(){
+    perlinSeed += 0.025f;                                  //// SPEED OF FLUX WITHIN FEATURE
+    outsideShape = createShape();
+    outsideShape.beginShape();
+    insideShape = createShape();
+    insideShape.beginShape();
+    increment = random(maxSize*0.001f, maxSize*0.03f);
+
+    for (float v = 0; v < TWO_PI; v+=0.025f){
+        float xoff = map(cos(v)+perlinSeed, -1, 1, 1, 3); //// JAGGEDNESS OF EDGES (HIGHER = MORE JAGGED)
+        float yoff = map(sin(v)+perlinSeed, -1, 1, 1, 3); //// JAGGEDNESS OF EDGES (HIGHER = MORE JAGGED)
+
+        //// MOVING THROUGH NOISE SPACE:
+        float n = map((float) (noise .eval(xoff, yoff)), -1, 1, 0, 1);
+        float r = map(n, -1, 1, currentSize - flux, currentSize);
+
+        float vX = r * cos(v);
+        float vY = r * sin(v);
+
+        outsideShape.vertex(vX, vY);
+        insideShape.vertex(vX, vY);
+
+    }
+
+    outsideShape.endShape(CLOSE);
+    insideShape.endShape(CLOSE);
+    insideShape.scale(0.5f);
+
+    outsideShape.setFill(color(46, 1, 4, outsideOpacity));
+    insideShape.setFill(color(46, 1, 4, insideOpacity));
+
+  }
+
+
 
   public void showSpots(){
-
     pushMatrix();
-      fill(color(46, 1, 4, 64));              //// color(46, 1, 4) = DARK RED-ISH
-      // fill(color(250, 234, 206, 64));            //// color(250, 234, 206) = BRIGHT YELLOW-ISH
-      translate(xPos, yPos);                     //// PLACE UNDER MOUSE (OR WHEREVER xPos/yPos HAS BEEN SET)
-      shape(featureShape);
-      featureShape.scale(2);                     //// DOUBLE SHAPE SIZE
-      shape(featureShape);
-      featureShape.scale(0.5f);                   //// RESIZE BACK TO NORMAL //// SIMPLER THAN COPYING CUSTOM SHAPES
+      translate(pos.x, pos.y);  //// PLACE UNDER MOUSE (OR WHEREVER pos.x/pos.y HAS BEEN SET)
+      shape(outsideShape);
+      shape(insideShape);
     popMatrix();
+
+
+
   }
+
+  public void moveSpot(){
+
+    if (dist(pos.x, pos.y, arches[dest].x, arches[dest].y) > 0.1f){
+
+      acc = PVector.random2D().mult(0.025f);
+
+      vel.add(acc);
+      pos.add(vel);
+    }
+  }
+
 
   public void update(){
     makeSpotShape(); //// MAKE NEW SHAPE WITH SLIGHTLY DIFFERENT VERTS (CREATES THE FLUX EFFECT)
+    moveSpot();
 
-    if (currentSize >= maxSize){
-      increment = 0;
-      age += 1;
-      if (age >= lifeSpan){
-        increment = -(maxSize*0.005f);
-      }
+    if (currentSize < maxSize && maxed == false){
+      currentSize += increment;
+    }
+    else{
+      maxed = true;
     }
 
-    currentSize += increment;
+    if(maxed){
+      age += 1;
+    }
+
+    if (age > lifeSpan){
+      currentSize -= increment;
+    }
+
+
+
 
   }
 }

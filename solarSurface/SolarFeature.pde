@@ -1,106 +1,128 @@
-String dataDir    = "../data/";
-OPC opc;
+class SolarFeature{
+  PShape  outsideShape;
+  PShape  insideShape;
 
-int canvasWidth   = 55; //// 55
-int canvasHeight  = 91; //// 19
+  PVector pos = new PVector(0, 0);
+  PVector vel = new PVector(0, 0);
+  PVector acc = new PVector(0, 0);
 
-float noiseIncrement = 0.25;  /// CHANGE SIZE OF GRANUAL
-float zoff = 0.0;
-float xoffStart = 90.0;
+  int dest = round(random(0, 11));
 
-OpenSimplexNoise noise;
+  int     type;
+  int     age = 0;                          //// CURRENT LIFETIME OF THIS FEATURE (IN FPS)
+  int     outsideOpacity = 64;
+  int     insideOpacity = 200;
 
-PImage solarSurface;
-PImage spotColor;
-PImage plageColor;
+  float   lifeSpan = 5 * frameRate;       //// NUM OF SECONDS * FPS TO KEEP FEATURE AT MAX OPACITY (ASSUMING ~60FPS)
+  float   currentSize = 0;
+  float   maxSize = random(canvasWidth*0.01, canvasWidth*0.2);  //// MAX SIZE OF FEATURE (10% OF CANVAS WIDTH)
+  float   perlinSeed = random(100);
+  float   increment;
+  float   flux = 0.75;
 
-ArrayList<SolarFeature> solarFeatures;
+  boolean maxed = false;
 
-void settings(){
-  size(canvasWidth, canvasHeight);
-}
-
-void setup(){
-  // blendMode(DARKEST);  //// FOR BLENDING OF THE FEATURES WITH THE SURFACE
-
-  opc = new OPC(this, "127.0.0.1", 7890);  // Connect to the local instance of fcserver
-  opc.ledGrid(0, 54, 90, width/2, height/2, width/width, height/height, 0, false, false); // Create LED Grid
-
-  noStroke();
-  noFill();
-
-  noise         = new OpenSimplexNoise();
-  solarFeatures = new ArrayList<SolarFeature>();
-  solarSurface  = loadImage(dataDir + "solarSurface.png");
-  spotColor     = loadImage(dataDir + "sunspot.png");
-  plageColor    = loadImage(dataDir + "plage.png");
-
-}
-
-void draw() {
-  drawSurface();
-  drawFeatures();
-}
+  color   featureColor;
 
 
-void mousePressed(){
-  int spotDensity = 1; //// MAKING MULTIPLE SPOTS ON TOP OF EACH OTHER MAKES A NICE FADING EFFECT
-    for (int s = 0; s < spotDensity; s++){
-      //// 0 == SPOT  /   1 == PLAGE
-      // solarFeatures.add(new SolarFeature(mouseX, mouseY, 0));
-      solarFeatures.add(new SolarFeature(mouseX, mouseY, 0));
+
+  SolarFeature(int x, int y, int type){
+    pos.x = x;
+    pos.y = y;
+
+    if (type == 0){
+      makeSpotShape();
+    }
+
   }
-}
 
-
-void drawFeatures(){
-  if (solarFeatures.size() > 0){
-    for (int i = 0; i < solarFeatures.size(); i++){
-
-    if (solarFeatures.get(i).type == 0) {
-      solarFeatures.get(i).show();
-      solarFeatures.get(i).update();
-      if (solarFeatures.get(i).currentSize <= 0){
-        solarFeatures.remove(i);  //// REMOVE OLDER SUN SPOTS
-      }
-    }
-    else if (solarFeatures.get(i).type == 1) {
-
-    }
-    }
+  void show(){
+    showSpots();
   }
-}
 
+  void makeSpotShape(){
+    perlinSeed += 0.025;                                  //// SPEED OF FLUX WITHIN FEATURE
+    outsideShape = createShape();
+    outsideShape.beginShape();
+    insideShape = createShape();
+    insideShape.beginShape();
+    increment = random(maxSize*0.001, maxSize*0.03);
 
-void drawSurface(){
-  loadPixels();
-  float xoff = xoffStart;
-  xoffStart -= 0.01;              /// ADJUST SPEED OF LEFT-RIGHT FLOW
-  zoff += 0.05;                  /// ADJUST SPEED OF 3D FLOW
+    for (float v = 0; v < TWO_PI; v+=0.025){
+        float xoff = map(cos(v)+perlinSeed, -1, 1, 1, 3); //// JAGGEDNESS OF EDGES (HIGHER = MORE JAGGED)
+        float yoff = map(sin(v)+perlinSeed, -1, 1, 1, 3); //// JAGGEDNESS OF EDGES (HIGHER = MORE JAGGED)
 
-  for (int x = 0; x < width; x++) {
-    xoff += noiseIncrement;
-    float yoff = 0.0;
-    for (int y = 0; y < height; y++) {
-      yoff += noiseIncrement;
+        //// MOVING THROUGH NOISE SPACE:
+        float n = map((float) (noise .eval(xoff, yoff)), -1, 1, 0, 1);
+        float r = map(n, -1, 1, currentSize - flux, currentSize);
 
-      float n = (float) noise.eval(xoff, yoff, zoff);
+        float vX = r * cos(v);
+        float vY = r * sin(v);
 
-      int colorPos;
-      PImage colorField;
-
-      // if (dist(x,y, x, height/2) < 10){
-      //   colorField = plageColor;
-      // }
-      // else{
-        colorField = solarSurface;
-      // }
-
-      colorPos = round(map(n, -1, 1, 0, colorField.width));
-      pixels[x+y*width] = color(colorField.get(colorPos, 0));
-
+        outsideShape.vertex(vX, vY);
+        insideShape.vertex(vX, vY);
 
     }
+
+    outsideShape.endShape(CLOSE);
+    insideShape.endShape(CLOSE);
+    insideShape.scale(0.5);
+
+    outsideShape.setFill(color(46, 1, 4, outsideOpacity));
+    insideShape.setFill(color(46, 1, 4, insideOpacity));
+
   }
-  updatePixels();
+
+
+
+  void showSpots(){
+    pushMatrix();
+      translate(pos.x, pos.y);  //// PLACE UNDER MOUSE (OR WHEREVER pos.x/pos.y HAS BEEN SET)
+      shape(outsideShape);
+      shape(insideShape);
+    popMatrix();
+
+
+
+  }
+
+  void moveSpot(){
+
+    if (dist(pos.x, pos.y, arches[dest].x, arches[dest].y) > 0.1){
+
+      ///// MOVE TOWARD DEST
+      dest.sub(pos);
+
+    }
+
+    acc = PVector.random2D().mult(0.025);
+    vel.add(acc);
+    pos.add(vel);
+
+  }
+
+
+  void update(){
+    makeSpotShape(); //// MAKE NEW SHAPE WITH SLIGHTLY DIFFERENT VERTS (CREATES THE FLUX EFFECT)
+    moveSpot();
+
+    if (currentSize < maxSize && maxed == false){
+      currentSize += increment;
+    }
+    else{
+      maxed = true;
+    }
+
+    if(maxed){
+      age += 1;
+    }
+
+    if (age > lifeSpan){
+      currentSize -= increment;
+    }
+
+
+
+
+  }
 }
