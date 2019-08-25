@@ -6,7 +6,7 @@ class SolarFeature{
   PVector vel = new PVector(0, 0);
   PVector acc = new PVector(0, 0);
 
-  int dest = round(random(0, 11));
+  int     destArch = round(random(0, 11));
 
   int     type;
   int     age = 0;                          //// CURRENT LIFETIME OF THIS FEATURE (IN FPS)
@@ -29,6 +29,7 @@ class SolarFeature{
   SolarFeature(int x, int y, int type){
     pos.x = x;
     pos.y = y;
+
 
     if (type == 0){
       makeSpotShape();
@@ -76,28 +77,46 @@ class SolarFeature{
 
 
   void showSpots(){
-    pushMatrix();
-      translate(pos.x, pos.y);  //// PLACE UNDER MOUSE (OR WHEREVER pos.x/pos.y HAS BEEN SET)
-      shape(outsideShape);
-      shape(insideShape);
-    popMatrix();
+    // pushMatrix();
+      // translate(pos.x, pos.y);  //// PLACE UNDER MOUSE (OR WHEREVER pos.x/pos.y HAS BEEN SET)
+      shape(outsideShape, pos.x, pos.y);
+      shape(insideShape, pos.x, pos.y);
+    // popMatrix();
 
 
 
   }
 
+  int count = 0;
+
   void moveSpot(){
+    //
 
-    if (dist(pos.x, pos.y, arches[dest].x, arches[dest].y) > 0.1){
 
-      ///// MOVE TOWARD DEST
-      dest.sub(pos);
+    //   ///// MOVE TOWARD DEST
+    PVector dest = new PVector();
+    dest = arches[destArch].copy();
+    if (dist(pos.x, pos.y, dest.x, dest.y) < 10){
+
+      println(count++);
+      // acc.add(PVector.random2D().mult(0.075));
 
     }
 
-    acc = PVector.random2D().mult(0.025);
+
+    dest.sub(pos);
+    dest.setMag(0.0001);
+    acc = dest;
+
+    // vel = new PVector(0, 0);
+    // acc = new PVector(0, 0);
+    acc.add(PVector.random2D().mult(0.005));
     vel.add(acc);
     pos.add(vel);
+
+
+
+
 
   }
 

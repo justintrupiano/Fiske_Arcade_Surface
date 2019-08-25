@@ -61,24 +61,64 @@ public void setup(){
 
 
   ///////////// HARD CODE POS OF ARCHES /////////////
-  arches[0] = new PVector(0, 0);
-  arches[1] = new PVector(0, 55);
-
-  arches[2] = new PVector(18, 0);
-  arches[3] = new PVector(18,55);
-
-  arches[4] = new PVector(36, 0);
-  arches[5] = new PVector(36,55);
-
-  arches[6] = new PVector(54, 0);
-  arches[7] = new PVector(54,55);
-
-  arches[8] = new PVector(72, 0);
-  arches[9] = new PVector(72,55);
-
-  arches[10] = new PVector(91, 0);
-  arches[11] = new PVector(91,55);
+  // arches[0] = new PVector(0, 0);
+  // arches[1] = new PVector(0, 55);
+  //
+  // arches[2] = new PVector(18, 0);
+  // arches[3] = new PVector(18,55);
+  //
+  // arches[4] = new PVector(36, 0);
+  // arches[5] = new PVector(36,55);
+  //
+  // arches[6] = new PVector(54, 0);
+  // arches[7] = new PVector(54,55);
+  //
+  // arches[8] = new PVector(72, 0);
+  // arches[9] = new PVector(72,55);
+  //
+  // arches[10] = new PVector(91, 0);
+  // arches[11] = new PVector(91,55);
   ///////////////////////////////////
+
+
+  ///////////// HARD CODE POS OF ARCHES /////////////
+  // arches[0] = new PVector(0, 0);
+  // arches[1] = new PVector(55, 0);
+  //
+  // arches[2] = new PVector(0, 18);
+  // arches[3] = new PVector(55, 18);
+  //
+  // arches[4] = new PVector(0, 36);
+  // arches[5] = new PVector(55, 36);
+  //
+  // arches[6] = new PVector(0, 54);
+  // arches[7] = new PVector(55, 54);
+  //
+  // arches[8] = new PVector(0, 72);
+  // arches[9] = new PVector(55, 72);
+  //
+  // arches[10] = new PVector(0, 91);
+  // arches[11] = new PVector(55, 91);
+  ///////////////////////////////////
+
+
+  arches[0] = new PVector(0, 0);
+  arches[1] = new PVector(width, 0);
+
+  arches[2] = new PVector(0, height*0.18f);
+  arches[3] = new PVector(width, height*0.18f);
+
+  arches[4] = new PVector(0, height*0.36f);
+  arches[5] = new PVector(width, height*0.36f);
+
+  arches[6] = new PVector(0, height*0.54f);
+  arches[7] = new PVector(width, height*0.54f);
+
+  arches[8] = new PVector(0, height*0.72f);
+  arches[9] = new PVector(width, height*0.72f);
+
+  arches[10] = new PVector(0, height);
+  arches[11] = new PVector(width, height);
 
 
 
@@ -539,7 +579,7 @@ class SolarFeature{
   PVector vel = new PVector(0, 0);
   PVector acc = new PVector(0, 0);
 
-  int dest = round(random(0, 11));
+  int     destArch = round(random(0, 11));
 
   int     type;
   int     age = 0;                          //// CURRENT LIFETIME OF THIS FEATURE (IN FPS)
@@ -562,6 +602,7 @@ class SolarFeature{
   SolarFeature(int x, int y, int type){
     pos.x = x;
     pos.y = y;
+
 
     if (type == 0){
       makeSpotShape();
@@ -609,25 +650,47 @@ class SolarFeature{
 
 
   public void showSpots(){
-    pushMatrix();
-      translate(pos.x, pos.y);  //// PLACE UNDER MOUSE (OR WHEREVER pos.x/pos.y HAS BEEN SET)
-      shape(outsideShape);
-      shape(insideShape);
-    popMatrix();
+    // pushMatrix();
+      // translate(pos.x, pos.y);  //// PLACE UNDER MOUSE (OR WHEREVER pos.x/pos.y HAS BEEN SET)
+      shape(outsideShape, pos.x, pos.y);
+      shape(insideShape, pos.x, pos.y);
+    // popMatrix();
 
 
 
   }
 
+  int count = 0;
+
   public void moveSpot(){
+    //
 
-    if (dist(pos.x, pos.y, arches[dest].x, arches[dest].y) > 0.1f){
 
-      acc = PVector.random2D().mult(0.025f);
+    //   ///// MOVE TOWARD DEST
+    PVector dest = new PVector();
+    dest = arches[destArch].copy();
+    if (dist(pos.x, pos.y, dest.x, dest.y) < 10){
 
-      vel.add(acc);
-      pos.add(vel);
+      println(count++);
+      // acc.add(PVector.random2D().mult(0.075));
+
     }
+
+
+    dest.sub(pos);
+    dest.setMag(0.0001f);
+    acc = dest;
+
+    // vel = new PVector(0, 0);
+    // acc = new PVector(0, 0);
+    acc.add(PVector.random2D().mult(0.005f));
+    vel.add(acc);
+    pos.add(vel);
+
+
+
+
+
   }
 
 

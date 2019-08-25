@@ -42,24 +42,64 @@ void setup(){
 
 
   ///////////// HARD CODE POS OF ARCHES /////////////
-  arches[0] = new PVector(0, 0);
-  arches[1] = new PVector(0, 55);
-
-  arches[2] = new PVector(18, 0);
-  arches[3] = new PVector(18,55);
-
-  arches[4] = new PVector(36, 0);
-  arches[5] = new PVector(36,55);
-
-  arches[6] = new PVector(54, 0);
-  arches[7] = new PVector(54,55);
-
-  arches[8] = new PVector(72, 0);
-  arches[9] = new PVector(72,55);
-
-  arches[10] = new PVector(91, 0);
-  arches[11] = new PVector(91,55);
+  // arches[0] = new PVector(0, 0);
+  // arches[1] = new PVector(0, 55);
+  //
+  // arches[2] = new PVector(18, 0);
+  // arches[3] = new PVector(18,55);
+  //
+  // arches[4] = new PVector(36, 0);
+  // arches[5] = new PVector(36,55);
+  //
+  // arches[6] = new PVector(54, 0);
+  // arches[7] = new PVector(54,55);
+  //
+  // arches[8] = new PVector(72, 0);
+  // arches[9] = new PVector(72,55);
+  //
+  // arches[10] = new PVector(91, 0);
+  // arches[11] = new PVector(91,55);
   ///////////////////////////////////
+
+
+  ///////////// HARD CODE POS OF ARCHES /////////////
+  // arches[0] = new PVector(0, 0);
+  // arches[1] = new PVector(55, 0);
+  //
+  // arches[2] = new PVector(0, 18);
+  // arches[3] = new PVector(55, 18);
+  //
+  // arches[4] = new PVector(0, 36);
+  // arches[5] = new PVector(55, 36);
+  //
+  // arches[6] = new PVector(0, 54);
+  // arches[7] = new PVector(55, 54);
+  //
+  // arches[8] = new PVector(0, 72);
+  // arches[9] = new PVector(55, 72);
+  //
+  // arches[10] = new PVector(0, 91);
+  // arches[11] = new PVector(55, 91);
+  ///////////////////////////////////
+
+
+  arches[0] = new PVector(0, 0);
+  arches[1] = new PVector(width, 0);
+
+  arches[2] = new PVector(0, height*0.18);
+  arches[3] = new PVector(width, height*0.18);
+
+  arches[4] = new PVector(0, height*0.36);
+  arches[5] = new PVector(width, height*0.36);
+
+  arches[6] = new PVector(0, height*0.54);
+  arches[7] = new PVector(width, height*0.54);
+
+  arches[8] = new PVector(0, height*0.72);
+  arches[9] = new PVector(width, height*0.72);
+
+  arches[10] = new PVector(0, height);
+  arches[11] = new PVector(width, height);
 
 
 
