@@ -1,3 +1,7 @@
+import processing.serial.*;
+
+Serial[] ports;
+
 String dataDir    = "../data/";
 OPC opc;
 
@@ -6,7 +10,7 @@ PImage spotColor;
 
 int canvasWidth   = 55; //// 55
 int canvasHeight  = 91; //// 19
-int maxNumFeatures = 100;
+int maxNumFeatures = 50;
 
 float noiseIncrement = 0.25;  /// CHANGE SIZE OF GRANUAL
 float zoff = 0.0;
@@ -28,7 +32,10 @@ void settings(){
 void setup(){
   // blendMode(DARKEST);  //// FOR BLENDING OF THE FEATURES WITH THE SURFACE
   // frameRate(5);
-
+  ports = new Serial[Serial.list().length-2];
+  for (int i = 0; i < ports.length; i++){
+    ports[i] = new Serial(this, Serial.list()[i+1], 9600);
+  }
   opc = new OPC(this, "127.0.0.1", 7890);  // Connect to the local instance of fcserver
   opc.ledGrid(0, 54, 90, width/2, height/2, width/width, height/height, 0, false, false); // Create LED Grid
 
@@ -39,48 +46,6 @@ void setup(){
   solarSurface  = loadImage(dataDir + "solarSurface.png");
   spotColor     = loadImage(dataDir + "sunspot.png");
   // plageColor    = loadImage(dataDir + "plage.png");
-
-
-  ///////////// HARD CODE POS OF ARCHES /////////////
-  // arches[0] = new PVector(0, 0);
-  // arches[1] = new PVector(0, 55);
-  //
-  // arches[2] = new PVector(18, 0);
-  // arches[3] = new PVector(18,55);
-  //
-  // arches[4] = new PVector(36, 0);
-  // arches[5] = new PVector(36,55);
-  //
-  // arches[6] = new PVector(54, 0);
-  // arches[7] = new PVector(54,55);
-  //
-  // arches[8] = new PVector(72, 0);
-  // arches[9] = new PVector(72,55);
-  //
-  // arches[10] = new PVector(91, 0);
-  // arches[11] = new PVector(91,55);
-  ///////////////////////////////////
-
-
-  ///////////// HARD CODE POS OF ARCHES /////////////
-  // arches[0] = new PVector(0, 0);
-  // arches[1] = new PVector(55, 0);
-  //
-  // arches[2] = new PVector(0, 18);
-  // arches[3] = new PVector(55, 18);
-  //
-  // arches[4] = new PVector(0, 36);
-  // arches[5] = new PVector(55, 36);
-  //
-  // arches[6] = new PVector(0, 54);
-  // arches[7] = new PVector(55, 54);
-  //
-  // arches[8] = new PVector(0, 72);
-  // arches[9] = new PVector(55, 72);
-  //
-  // arches[10] = new PVector(0, 91);
-  // arches[11] = new PVector(55, 91);
-  ///////////////////////////////////
 
 
   arches[0] = new PVector(0, 0);
@@ -179,4 +144,16 @@ void drawSurface(){
     }
   }
   updatePixels();
+}
+
+
+
+
+void serialEvent(Serial p){
+  int received = p.read();
+  if (received == '1' && solarFeatures.size() < maxNumFeatures){
+      solarFeatures.add(new SolarFeature(round((width/2)+random(-5, 5)),round(random(0, height)) , 0));
+      println(p);
+  }
+
 }

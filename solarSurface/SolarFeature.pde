@@ -13,7 +13,7 @@ class SolarFeature{
   int     outsideOpacity = 64;
   int     insideOpacity = 200;
 
-  float   lifeSpan = 5 * frameRate;       //// NUM OF SECONDS * FPS TO KEEP FEATURE AT MAX OPACITY (ASSUMING ~60FPS)
+  float   lifeSpan = 10 * frameRate;       //// NUM OF SECONDS * FPS TO KEEP FEATURE AT MAX OPACITY (ASSUMING ~60FPS)
   float   currentSize = 0;
   float   maxSize = random(canvasWidth*0.01, canvasWidth*0.2);  //// MAX SIZE OF FEATURE (10% OF CANVAS WIDTH)
   float   perlinSeed = random(100);
@@ -98,14 +98,14 @@ class SolarFeature{
     dest = arches[destArch].copy();
     if (dist(pos.x, pos.y, dest.x, dest.y) < 10){
 
-      println(count++);
+      //println(count++);
       // acc.add(PVector.random2D().mult(0.075));
 
     }
 
 
     dest.sub(pos);
-    dest.setMag(0.0001);
+    dest.setMag(0.001);
     acc = dest;
 
     // vel = new PVector(0, 0);

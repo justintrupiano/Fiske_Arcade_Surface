@@ -15,7 +15,7 @@ long randomTailNumber;
 long randomSpeed;
 
 // Parameters to read sensor state
-int sensorState = 0;
+int sensorState;
 int sensorCounter = 0;
 int lastSensorState = 0;
 
@@ -86,6 +86,9 @@ void loop()
   {
     effectFiveListener();
   }
+
+  sensorState = digitalRead(SENSOR);
+  Serial.println(sensorState);
 }
 
 // Global functions for all effects.
