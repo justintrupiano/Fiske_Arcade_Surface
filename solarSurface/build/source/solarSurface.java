@@ -3,6 +3,7 @@ import processing.data.*;
 import processing.event.*; 
 import processing.opengl.*; 
 
+import processing.serial.*; 
 import java.net.*; 
 import java.util.Arrays; 
 
@@ -17,6 +18,10 @@ import java.io.IOException;
 
 public class solarSurface extends PApplet {
 
+
+
+Serial[] ports;
+
 String dataDir    = "../data/";
 OPC opc;
 
@@ -25,7 +30,7 @@ PImage spotColor;
 
 int canvasWidth   = 55; //// 55
 int canvasHeight  = 91; //// 19
-int maxNumFeatures = 100;
+int maxNumFeatures = 50;
 
 float noiseIncrement = 0.25f;  /// CHANGE SIZE OF GRANUAL
 float zoff = 0.0f;
@@ -39,15 +44,21 @@ ArrayList<SolarFeature> solarFeatures;
 
 PVector[] arches = new PVector[12];
 
+String[] itsybitsies;
+
+
 
 public void settings(){
   size(canvasWidth, canvasHeight);
 }
 
 public void setup(){
-  // blendMode(DARKEST);  //// FOR BLENDING OF THE FEATURES WITH THE SURFACE
-  // frameRate(5);
+  makeItsyArray();
 
+  ports = new Serial[itsybitsies.length];
+  for (int i = 0; i < ports.length; i++){
+    ports[i] = new Serial(this, itsybitsies[i], 9600);
+  }
   opc = new OPC(this, "127.0.0.1", 7890);  // Connect to the local instance of fcserver
   opc.ledGrid(0, 54, 90, width/2, height/2, width/width, height/height, 0, false, false); // Create LED Grid
 
@@ -58,48 +69,6 @@ public void setup(){
   solarSurface  = loadImage(dataDir + "solarSurface.png");
   spotColor     = loadImage(dataDir + "sunspot.png");
   // plageColor    = loadImage(dataDir + "plage.png");
-
-
-  ///////////// HARD CODE POS OF ARCHES /////////////
-  // arches[0] = new PVector(0, 0);
-  // arches[1] = new PVector(0, 55);
-  //
-  // arches[2] = new PVector(18, 0);
-  // arches[3] = new PVector(18,55);
-  //
-  // arches[4] = new PVector(36, 0);
-  // arches[5] = new PVector(36,55);
-  //
-  // arches[6] = new PVector(54, 0);
-  // arches[7] = new PVector(54,55);
-  //
-  // arches[8] = new PVector(72, 0);
-  // arches[9] = new PVector(72,55);
-  //
-  // arches[10] = new PVector(91, 0);
-  // arches[11] = new PVector(91,55);
-  ///////////////////////////////////
-
-
-  ///////////// HARD CODE POS OF ARCHES /////////////
-  // arches[0] = new PVector(0, 0);
-  // arches[1] = new PVector(55, 0);
-  //
-  // arches[2] = new PVector(0, 18);
-  // arches[3] = new PVector(55, 18);
-  //
-  // arches[4] = new PVector(0, 36);
-  // arches[5] = new PVector(55, 36);
-  //
-  // arches[6] = new PVector(0, 54);
-  // arches[7] = new PVector(55, 54);
-  //
-  // arches[8] = new PVector(0, 72);
-  // arches[9] = new PVector(55, 72);
-  //
-  // arches[10] = new PVector(0, 91);
-  // arches[11] = new PVector(55, 91);
-  ///////////////////////////////////
 
 
   arches[0] = new PVector(0, 0);
@@ -120,11 +89,10 @@ public void setup(){
   arches[10] = new PVector(0, height);
   arches[11] = new PVector(width, height);
 
-
-
 }
 
 public void draw() {
+  makeItsyArray();
   drawSurface();
   drawFeatures();
 }
@@ -146,7 +114,6 @@ public void drawFeatures(){
     if (solarFeatures.get(i).type == 0) {
       solarFeatures.get(i).show();
       solarFeatures.get(i).update();
-
     }
     // else if (solarFeatures.get(i).type == 1) {
     //
@@ -161,9 +128,6 @@ public void drawFeatures(){
   }
 
   }
-
-
-
 }
 
 
@@ -194,10 +158,36 @@ public void drawSurface(){
       colorPos = round(map(n, -1, 1, 0, colorField.width));
       pixels[x+y*width] = color(colorField.get(colorPos, 0));
 
-
     }
   }
   updatePixels();
+}
+
+
+public void makeItsyArray(){
+  itsybitsies = loadStrings( dataDir + "panel_order");
+
+  ports = new Serial[itsybitsies.length];
+  for (int i = 0; i < ports.length; i++){
+    ports[i] = new Serial(this, itsybitsies[i], 9600);
+  }
+}
+
+public void serialEvent(Serial p){
+  int received = p.read();
+  if (received == '1' && solarFeatures.size() < maxNumFeatures){
+      //// 9 + (INDEX * 18)
+      for (int i = 0; i < itsybitsies.length; i++){
+        if (ports[i] == p){
+          //// 9 + (INDEX * 18)
+          solarFeatures.add(new SolarFeature(round((width/2)+random(-5, 5)), 9 + (i*18), 0));
+          break;
+        }
+      }
+  }
+
+
+
 }
 /*
  * Simple Open Pixel Control client for Processing,
@@ -586,7 +576,7 @@ class SolarFeature{
   int     outsideOpacity = 64;
   int     insideOpacity = 200;
 
-  float   lifeSpan = 5 * frameRate;       //// NUM OF SECONDS * FPS TO KEEP FEATURE AT MAX OPACITY (ASSUMING ~60FPS)
+  float   lifeSpan = 10 * frameRate;       //// NUM OF SECONDS * FPS TO KEEP FEATURE AT MAX OPACITY (ASSUMING ~60FPS)
   float   currentSize = 0;
   float   maxSize = random(canvasWidth*0.01f, canvasWidth*0.2f);  //// MAX SIZE OF FEATURE (10% OF CANVAS WIDTH)
   float   perlinSeed = random(100);
@@ -671,14 +661,14 @@ class SolarFeature{
     dest = arches[destArch].copy();
     if (dist(pos.x, pos.y, dest.x, dest.y) < 10){
 
-      println(count++);
+      //println(count++);
       // acc.add(PVector.random2D().mult(0.075));
 
     }
 
 
     dest.sub(pos);
-    dest.setMag(0.0001f);
+    dest.setMag(0.001f);
     acc = dest;
 
     // vel = new PVector(0, 0);

@@ -24,17 +24,20 @@ ArrayList<SolarFeature> solarFeatures;
 
 PVector[] arches = new PVector[12];
 
+String[] itsybitsies;
+
+
 
 void settings(){
   size(canvasWidth, canvasHeight);
 }
 
 void setup(){
-  // blendMode(DARKEST);  //// FOR BLENDING OF THE FEATURES WITH THE SURFACE
-  // frameRate(5);
-  ports = new Serial[Serial.list().length-2];
+  makeItsyArray();
+
+  ports = new Serial[itsybitsies.length];
   for (int i = 0; i < ports.length; i++){
-    ports[i] = new Serial(this, Serial.list()[i+1], 9600);
+    ports[i] = new Serial(this, itsybitsies[i], 9600);
   }
   opc = new OPC(this, "127.0.0.1", 7890);  // Connect to the local instance of fcserver
   opc.ledGrid(0, 54, 90, width/2, height/2, width/width, height/height, 0, false, false); // Create LED Grid
@@ -66,11 +69,10 @@ void setup(){
   arches[10] = new PVector(0, height);
   arches[11] = new PVector(width, height);
 
-
-
 }
 
 void draw() {
+  makeItsyArray();
   drawSurface();
   drawFeatures();
 }
@@ -92,7 +94,6 @@ void drawFeatures(){
     if (solarFeatures.get(i).type == 0) {
       solarFeatures.get(i).show();
       solarFeatures.get(i).update();
-
     }
     // else if (solarFeatures.get(i).type == 1) {
     //
@@ -107,9 +108,6 @@ void drawFeatures(){
   }
 
   }
-
-
-
 }
 
 
@@ -140,20 +138,34 @@ void drawSurface(){
       colorPos = round(map(n, -1, 1, 0, colorField.width));
       pixels[x+y*width] = color(colorField.get(colorPos, 0));
 
-
     }
   }
   updatePixels();
 }
 
 
+void makeItsyArray(){
+  itsybitsies = loadStrings( dataDir + "panel_order");
 
+  ports = new Serial[itsybitsies.length];
+  for (int i = 0; i < ports.length; i++){
+    ports[i] = new Serial(this, itsybitsies[i], 9600);
+  }
+}
 
 void serialEvent(Serial p){
   int received = p.read();
   if (received == '1' && solarFeatures.size() < maxNumFeatures){
-      solarFeatures.add(new SolarFeature(round((width/2)+random(-5, 5)),round(random(0, height)) , 0));
-      println(p);
+      //// 9 + (INDEX * 18)
+      for (int i = 0; i < itsybitsies.length; i++){
+        if (ports[i] == p){
+          //// 9 + (INDEX * 18)
+          solarFeatures.add(new SolarFeature(round((width/2)+random(-5, 5)), 9 + (i*18), 0));
+          break;
+        }
+      }
   }
+
+
 
 }

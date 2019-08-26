@@ -9,7 +9,7 @@
 #define NUM_LEDS 360 //adjust this number if needed
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_LEDS, PIN, NEO_GRB + NEO_KHZ800);
 
-// Random variables 
+// Random variables
 long LEDrandomNumber;
 long randomTailNumber;
 long randomSpeed;
@@ -20,7 +20,7 @@ int sensorCounter = 0;
 int lastSensorState = 0;
 
 // Variables that can communicate with sensor values
-int REDbrightness; 
+int REDbrightness;
 int brightnessCounter;
 int minBrightness = 20;
 
@@ -34,7 +34,7 @@ int R = 100; // Red
 int r = 100;
 int G = 10; // Green
 int Gn = 0;
-int g = 100; 
+int g = 100;
 int B = 0; // Blue
 int b = 100;
 int buttonValue = 1;
@@ -46,27 +46,30 @@ int grad_red[(NUM_LEDS / 2) + 4];
 int grad_green[(NUM_LEDS / 2) + 4];
 int grad_blue[(NUM_LEDS / 2) + 4];
 
-void setup() 
+boolean sensorBlocked = false;
+
+
+void setup()
 {
   Serial.begin(9600); // Initialize console
   pinMode(SENSOR, INPUT); // Assign sensor to pin A2 as input
   strip.begin(); // Wake-up LED strip
-  colorWipe(strip.Color(5, 5, 5), 0); 
+  colorWipe(strip.Color(5, 5, 5), 0);
   strip.show(); // Initialize all pixels to 'off'
   Keyboard.begin(); // Initialize control over keyboard
 }
 
-void loop() 
+void loop()
 {
   // Example: If instance from processing is for effect 1: Call effectOneListener(). Same for calls to other effects or any other listener and so on
-  
+
   // Check for incoming serial data
-  if (Serial.available() > 0) 
+  if (Serial.available() > 0)
   {
     int keyPress = Serial.read();
     Serial.println("Pressed: " + keyPress);
-    
-    switch (keyPress) 
+
+    switch (keyPress)
     {
       case 'a':
         effectOneListener();
@@ -82,17 +85,26 @@ void loop()
         break;
     }
   }
-  else 
+  else
   {
     effectFiveListener();
   }
 
   sensorState = digitalRead(SENSOR);
-  Serial.println(sensorState);
+
+  if (sensorState == '1' && sensorBlocked == false){
+    Serial.println(sensorState);
+    sensorBlocked = true;
+  }
+  else if(sensorState == 0 && sensorBlocked == true){
+    sensorBlocked == false;
+  }
+
+
 }
 
 // Global functions for all effects.
-void showStrip() 
+void showStrip()
 {
 #ifdef ADAFRUIT_NEOPIXEL_H
   // NeoPixel
@@ -104,7 +116,7 @@ void showStrip()
 #endif
 }
 
-void colorWipe(uint32_t c, uint8_t wait) 
+void colorWipe(uint32_t c, uint8_t wait)
 {
   for (uint16_t i = 0; i < strip.numPixels(); i++) {
     strip.setPixelColor(i, c);
@@ -116,16 +128,16 @@ void colorWipe(uint32_t c, uint8_t wait)
 
 
 // Effect 1: Two flares crossing from one side to another side.
-void effectOneListener() 
+void effectOneListener()
 {
   LEDrandomNumber = random(5, 10);
   randomTailNumber = random(10, 30);
   randomSpeed = random(1, 1);
   plasmaRain_1(0xff, 0, 0, LEDrandomNumber, randomTailNumber, true, randomSpeed);
-  Serial.println("Effect one started"); 
+  Serial.println("Effect one started");
 }
 
-void plasmaRain_1(byte red, byte green, byte blue, byte meteorSize, byte meteorTrailDecay, boolean meteorRandomDecay, int SpeedDelay) 
+void plasmaRain_1(byte red, byte green, byte blue, byte meteorSize, byte meteorTrailDecay, boolean meteorRandomDecay, int SpeedDelay)
 {
   setAll_1(200, 5, 0);
 
@@ -152,7 +164,7 @@ void plasmaRain_1(byte red, byte green, byte blue, byte meteorSize, byte meteorT
   }
 }
 
-void fadeToBlack_1(int ledNo, byte fadeValue) 
+void fadeToBlack_1(int ledNo, byte fadeValue)
 {
 #ifdef ADAFRUIT_NEOPIXEL_H
   // NeoPixel
@@ -179,7 +191,7 @@ void fadeToBlack_1(int ledNo, byte fadeValue)
 #endif
 }
 
-void setPixel_1(int Pixel, byte red, byte green, byte blue) 
+void setPixel_1(int Pixel, byte red, byte green, byte blue)
 {
   //dripping flare's color control begins
 #ifdef ADAFRUIT_NEOPIXEL_H
@@ -234,7 +246,7 @@ void setPixel_1(int Pixel, byte red, byte green, byte blue)
 #endif
 }
 
-void setAll_1(byte red, byte green, byte blue) 
+void setAll_1(byte red, byte green, byte blue)
 {
   for (int i = 0; i < NUM_LEDS; i++ ) {
     setPixel_1(i, red, green, blue);
@@ -255,7 +267,7 @@ void effectTwoListener()
   plasmaRain_2(0xff, 0, 0, LEDrandomNumber, randomTailNumber, true, randomSpeed);
 }
 
-void plasmaRain_2(byte red, byte green, byte blue, byte meteorSize, byte meteorTrailDecay, boolean meteorRandomDecay, int SpeedDelay) 
+void plasmaRain_2(byte red, byte green, byte blue, byte meteorSize, byte meteorTrailDecay, boolean meteorRandomDecay, int SpeedDelay)
 {
   setAll_2(125, 114, 0);
 
@@ -283,7 +295,7 @@ void plasmaRain_2(byte red, byte green, byte blue, byte meteorSize, byte meteorT
   }
 }
 
-void fadeToBlack_2(int ledNo, byte fadeValue) 
+void fadeToBlack_2(int ledNo, byte fadeValue)
 {
 #ifdef ADAFRUIT_NEOPIXEL_H
   // NeoPixel
@@ -371,7 +383,7 @@ void effectThreeListener()
   plasmaRain_3(0xff, 0, 0, LEDrandomNumber, randomTailNumber, true, randomSpeed);
 }
 
-void plasmaRain_3(byte red, byte green, byte blue, byte meteorSize, byte meteorTrailDecay, boolean meteorRandomDecay, int SpeedDelay) 
+void plasmaRain_3(byte red, byte green, byte blue, byte meteorSize, byte meteorTrailDecay, boolean meteorRandomDecay, int SpeedDelay)
 {
   setAll_3(0, 0, 0);
 
@@ -398,7 +410,7 @@ void plasmaRain_3(byte red, byte green, byte blue, byte meteorSize, byte meteorT
 }
 
 
-void fadeToBlack_3(int ledNo, byte fadeValue) 
+void fadeToBlack_3(int ledNo, byte fadeValue)
 {
 #ifdef ADAFRUIT_NEOPIXEL_H
   // NeoPixel
@@ -423,7 +435,7 @@ void fadeToBlack_3(int ledNo, byte fadeValue)
 #endif
 }
 
-void setPixel_3(int Pixel, byte red, byte green, byte blue) 
+void setPixel_3(int Pixel, byte red, byte green, byte blue)
 {
 #ifdef ADAFRUIT_NEOPIXEL_H
 
@@ -471,7 +483,7 @@ void setPixel_3(int Pixel, byte red, byte green, byte blue)
 #endif
 }
 
-void setAll_3(byte red, byte green, byte blue) 
+void setAll_3(byte red, byte green, byte blue)
 {
   for (int i = 0; i < NUM_LEDS; i++ ) {
     setPixel_3(i, red, green, blue);
@@ -667,18 +679,18 @@ void effectFourListener()
 void effectFiveListener()
 {
     // Sets the gradient once
-    for (int i = 0; i < (NUM_LEDS / 2) + 1; i++) 
-    { 
-  
+    for (int i = 0; i < (NUM_LEDS / 2) + 1; i++)
+    {
+
     // strip.Color takes RGB values, from 0,0,0 up to 255,255,255
-  
+
     j = NUM_LEDS - 1 - i;
     g_gradient = map(i, 0, NUM_LEDS / 2, 0, R / 3);
     b_gradient = map(i, 0, NUM_LEDS / 2, 0, R / 3);
-  
+
     strip.setPixelColor(i + Mid, strip.Color(R, g_gradient, 0)); //Front
     strip.setPixelColor(j - Mid, strip.Color(R, g_gradient, 0)); //Back
-  
+
   }
   strip.show(); // This sends the updated pixel color to the hardware.
   //delay(delayval); // Delay for a period of time (in milliseconds).
