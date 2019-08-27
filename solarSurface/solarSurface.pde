@@ -176,6 +176,7 @@ void makeItsyArray(){
 
 void serialEvent(Serial p){
   int received = p.read();
+  //print(received);
   if (received == '1' && solarFeatures.size() < maxNumFeatures){
       //// 9 + (INDEX * 18)
       for (int i = 0; i < itsybitsies.length; i++){

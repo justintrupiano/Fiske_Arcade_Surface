@@ -56,7 +56,7 @@ void setup()
   strip.begin(); // Wake-up LED strip
   colorWipe(strip.Color(5, 5, 5), 0);
   strip.show(); // Initialize all pixels to 'off'
-  Keyboard.begin(); // Initialize control over keyboard
+  Keyboard.begin(); // Initialize control over keyboard//
 }
 
 void loop()
@@ -91,14 +91,15 @@ void loop()
   }
 
   sensorState = digitalRead(SENSOR);
-
-  if (sensorState == '1' && sensorBlocked == false){
     Serial.println(sensorState);
-    sensorBlocked = true;
-  }
-  else if(sensorState == 0 && sensorBlocked == true){
-    sensorBlocked == false;
-  }
+
+//  if (sensorState == '1' && sensorBlocked == false){
+//    Serial.println(sensorState);
+//    sensorBlocked = true;
+//  }
+//  else if(sensorState == 0 && sensorBlocked == true){
+//    sensorBlocked == false;
+//  }
 
 
 }
