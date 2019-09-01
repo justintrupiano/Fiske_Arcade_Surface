@@ -24,7 +24,7 @@ class SolarFeature{
 
   color   featureColor;
 
-
+  char chosenViz = archVisualizations[round(random(0, archVisualizations.length-1))];
 
   SolarFeature(int x, int y, int type){
     pos.x = x;
@@ -96,10 +96,21 @@ class SolarFeature{
     //   ///// MOVE TOWARD DEST
     PVector dest = new PVector();
     dest = arches[destArch].copy();
-    if (dist(pos.x, pos.y, dest.x, dest.y) < 10){
+    // if (dist(pos.x, pos.y, dest.x, dest.y) < 2 && age < lifeSpan){
+    if (dist(pos.x, pos.y, dest.x, dest.y) < 2){ //// DISTANCE FROM GOAL TO TRIGGER EFFECT
 
-      //println(count++);
-      // acc.add(PVector.random2D().mult(0.075));
+        // println("Arch: " + destArch);
+        // println("Itsy: " + floor(destArch/2));
+        // println(ports.length/2);
+        if (floor(destArch/2) <= ports.length/2){ //// ONLY TRIGGER EFFECT IF THE ITSY IS IN THE PORTS ARRAY
+          // ports[floor(destArch/2)].write(chosenViz);
+
+
+          // println("Arch: " + destArch);
+          println("Viz: " + chosenViz);
+          // println(floor(destArch/2));
+        }
+
 
     }
 
