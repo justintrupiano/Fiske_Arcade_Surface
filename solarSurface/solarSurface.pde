@@ -33,18 +33,11 @@ void settings(){
 }
 
 void setup(){
-  // blendMode(DARKEST);  //// FOR BLENDING OF THE FEATURES WITH THE SURFACE
-  // frameRate(5);
 
-  //ports = new Serial[Serial.list().length-2];
-  //for (int i = 0; i < ports.length; i++){
-  //  ports[i] = new Serial(this, Serial.list()[i+1], 9600);
-  //}
   makeItsyArray();
 
-
   opc = new OPC(this, "127.0.0.1", 7890);  // Connect to the local instance of fcserver
-  opc.ledGrid(0, 54, 90, width/2, height/2, width/width, height/height, 0, false, false); // Create LED Grid
+  opc.ledGrid(0, 54, 90, width/2, height/2, width/width, height/height, 0, false, true); // Create LED Grid
 
   noStroke();
 
@@ -55,52 +48,36 @@ void setup(){
   // plageColor    = loadImage(dataDir + "plage.png");
 
 
-
-//  Panel
-//
-//
-//
-//
-//
-
   // itsybitsies[0]
-  arches[0] = new PVector(-width+1, 7);
-  arches[1] = new PVector(0, 8);
+  arches[0] = new PVector(0, 7);
+  arches[1] = new PVector(width-1, 8);
 
   // itsybitsies[1]
-  arches[2] = new PVector(-width+1, 11);
-  arches[3] = new PVector(0, 23);
+  arches[2] = new PVector(0, 11);
+  arches[3] = new PVector(width-1, 23);
 
   // itsybitsies[2]
-  arches[4] = new PVector(-width+1, 27);
-  arches[5] = new PVector(0, 30);
+  arches[4] = new PVector(0, 27);
+  arches[5] = new PVector(width-1, 30);
 
   // itsybitsies[3]
-  arches[6] = new PVector(-width+1, 64);
-  arches[7] = new PVector(0, 48);
+  arches[6] = new PVector(0, 64);
+  arches[7] = new PVector(width-1, 48);
 
   // itsybitsies[4]
-  arches[8] = new PVector(-width+1, 43);
-  arches[9] = new PVector(0, 60);
+  arches[8] = new PVector(0, 43);
+  arches[9] = new PVector(width-1, 60);
 
   // itsybitsies[5]
-  arches[10] = new PVector(-width+1, 77);
-  arches[11] = new PVector(0, 82);
+  arches[10] = new PVector(0, 77);
+  arches[11] = new PVector(width-1, 82);
 }
 
 
 
 void draw() {
-  translate(width, 0); //// FLOOR IS INVERTED FROM CANVAS
   drawSurface();
   drawFeatures();
-  // fill(0, 0, 0);
-  // ellipse(-width, 77, 10, 10);
-  // ellipse(0, 82, 10, 10);
-
-  //if (second() == 0){
-  //  makeItsyArray();
-  //}
 }
 
 
@@ -108,7 +85,7 @@ void mousePressed(){
     if (solarFeatures.size() < maxNumFeatures){
       //// 0 == SPOT  /   1 == PLAGE
       // solarFeatures.add(new SolarFeature(mouseX, mouseY, 0));
-      solarFeatures.add(new SolarFeature(mouseX-width, mouseY, 0));
+      solarFeatures.add(new SolarFeature(mouseX, mouseY, 0));
   }
 }
 
@@ -116,28 +93,17 @@ void mousePressed(){
 void drawFeatures(){
   if (solarFeatures.size() > 0){
     for (int i = 0; i < solarFeatures.size(); i++){
-
-    if (solarFeatures.get(i).type == 0) {
-      solarFeatures.get(i).show();
-      solarFeatures.get(i).update();
-
-    }
-    // else if (solarFeatures.get(i).type == 1) {
-    //
-    // }
-    }
-
+      if (solarFeatures.get(i).type == 0) {
+        solarFeatures.get(i).show();
+        solarFeatures.get(i).update();
+      }
+  }
     for (int i = 0; i < solarFeatures.size(); i++){
-
       if (solarFeatures.get(i).currentSize < 0){
         solarFeatures.remove(i);  //// REMOVE OLDER SUN SPOTS
       }
+    }
   }
-
-  }
-
-
-
 }
 
 
@@ -157,18 +123,10 @@ void drawSurface(){
 
       int colorPos;
       PImage colorField;
-
-      // if (dist(x,y, x, height/2) < 10){
-      //   colorField = plageColor;
-      // }
-      // else{
-        colorField = solarSurface;
-      // }
+      colorField = solarSurface;
 
       colorPos = round(map(n, -1, 1, 0, colorField.width));
       pixels[x+y*width] = color(colorField.get(colorPos, 0));
-
-
     }
   }
   updatePixels();
@@ -187,16 +145,22 @@ void makeItsyArray(){
 
 void serialEvent(Serial p){
   int received = p.read();
-  //print(received);
   if (received == '1' && solarFeatures.size() < maxNumFeatures){
       //// 9 + (INDEX * 18)
       for (int i = 0; i < itsybitsies.length-1; i++){
         if (ports[i] == p){
           //// 9 + (INDEX * 18)
-          //println(i);
-          solarFeatures.add(new SolarFeature(round((-width/2)+random(-5, 5)), 9 + (i*18), 0));
+          solarFeatures.add(new SolarFeature(round((width/2)+random(-5, 5)), 9 + (i*18), 0));
           break;
         }
       }
+  }
+}
+
+
+void showArchLocations(){
+  for (int a = 0; a < arches.length; a++){
+    fill(map(a, 0, arches.length, 0, 255));
+    ellipse(arches[a].x, arches[a].y, 10, 10);
   }
 }

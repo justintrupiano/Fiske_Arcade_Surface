@@ -77,41 +77,21 @@ class SolarFeature{
 
 
   void showSpots(){
-    // pushMatrix();
-      // translate(pos.x, pos.y);  //// PLACE UNDER MOUSE (OR WHEREVER pos.x/pos.y HAS BEEN SET)
-      shape(outsideShape, pos.x, pos.y);
-      shape(insideShape, pos.x, pos.y);
-    // popMatrix();
-
-
-
+    shape(outsideShape, pos.x, pos.y);
+    shape(insideShape, pos.x, pos.y);
   }
 
   int count = 0;
 
   void moveSpot(){
-    //
-
-
-    //   ///// MOVE TOWARD DEST
+    ///// MOVE TOWARD DEST
     PVector dest = new PVector();
     dest = arches[destArch].copy();
-    // if (dist(pos.x, pos.y, dest.x, dest.y) < 2 && age < lifeSpan){
-    if (dist(pos.x, pos.y, dest.x, dest.y) < 2){ //// DISTANCE FROM GOAL TO TRIGGER EFFECT
+    if (dist(pos.x, pos.y, dest.x, dest.y) < 2 && age < lifeSpan){
 
-        // println("Arch: " + destArch);
-        // println("Itsy: " + floor(destArch/2));
-        // println(ports.length/2);
         if (floor(destArch/2) <= ports.length/2){ //// ONLY TRIGGER EFFECT IF THE ITSY IS IN THE PORTS ARRAY
-          // ports[floor(destArch/2)].write(chosenViz);
-
-
-          // println("Arch: " + destArch);
-          println("Viz: " + chosenViz);
-          // println(floor(destArch/2));
+          ports[floor(destArch/2)].write(chosenViz);
         }
-
-
     }
 
 
@@ -119,16 +99,9 @@ class SolarFeature{
     dest.setMag(0.001);
     acc = dest;
 
-    // vel = new PVector(0, 0);
-    // acc = new PVector(0, 0);
     acc.add(PVector.random2D().mult(0.005));
     vel.add(acc);
     pos.add(vel);
-
-
-
-
-
   }
 
 
@@ -150,9 +123,5 @@ class SolarFeature{
     if (age > lifeSpan){
       currentSize -= increment;
     }
-
-
-
-
   }
 }
