@@ -21,15 +21,17 @@ class SolarFeature{
   float   flux = 0.75;
 
   boolean maxed = false;
+  boolean sentFlare = false;
 
   color   featureColor;
 
   char chosenViz = archVisualizations[round(random(0, archVisualizations.length-1))];
 
+
+
   SolarFeature(int x, int y, int type){
     pos.x = x;
     pos.y = y;
-
 
     if (type == 0){
       makeSpotShape();
@@ -79,6 +81,7 @@ class SolarFeature{
   void showSpots(){
     shape(outsideShape, pos.x, pos.y);
     shape(insideShape, pos.x, pos.y);
+
   }
 
   int count = 0;
@@ -87,11 +90,14 @@ class SolarFeature{
     ///// MOVE TOWARD DEST
     PVector dest = new PVector();
     dest = arches[destArch].copy();
-    if (dist(pos.x, pos.y, dest.x, dest.y) < 2 && age < lifeSpan){
+    if (dist(pos.x, pos.y, dest.x, dest.y) < 2 && age < lifeSpan && !sentFlare){
 
         if (floor(destArch/2) <= ports.length/2){ //// ONLY TRIGGER EFFECT IF THE ITSY IS IN THE PORTS ARRAY
+          // ports[0].write(chosenViz);
           ports[floor(destArch/2)].write(chosenViz);
-        }
+	  // println(chosenViz);
+	sentFlare = true;        
+	}
     }
 
 

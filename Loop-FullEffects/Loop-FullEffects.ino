@@ -67,7 +67,7 @@ void loop()
   if (Serial.available() > 0)
   {
     int keyPress = Serial.read();
-    Serial.println("Pressed: " + keyPress);
+//    Serial.println("Pressed: " + keyPress);/
 
     switch (keyPress)
     {
@@ -91,7 +91,7 @@ void loop()
   }
 
   sensorState = digitalRead(SENSOR);
-    Serial.println(sensorState);
+  Serial.println(sensorState);
 
 //  if (sensorState == '1' && sensorBlocked == false){
 //    Serial.println(sensorState);

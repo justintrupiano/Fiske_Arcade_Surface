@@ -9,14 +9,15 @@ PImage solarSurface;
 PImage spotColor;
 
 int canvasWidth   = 55; //// 55
-int canvasHeight  = 91; //// 19
-int maxNumFeatures = 50;
+int canvasHeight  = 91; //// 91
+int maxNumFeatures = 100;
 
 float noiseIncrement = 0.25;  /// CHANGE SIZE OF GRANUAL
 float zoff = 0.0;
 float xoffStart = 90.0;
 
-char[] archVisualizations = {'a', 'b', 'c', 'd'};
+char[] archVisualizations = {'a'}; //// ADD MORE FOR DIFFERENT EFFECTS --- THESE ARE CHOSEN AT RANDOM IN THE 
+
 
 OpenSimplexNoise noise;
 
@@ -24,7 +25,7 @@ OpenSimplexNoise noise;
 
 ArrayList<SolarFeature> solarFeatures;
 
-PVector[] arches = new PVector[12];
+PVector[] arches;
 String[] itsybitsies;
 
 
@@ -45,32 +46,32 @@ void setup(){
   solarFeatures = new ArrayList<SolarFeature>();
   solarSurface  = loadImage(dataDir + "solarSurface.png");
   spotColor     = loadImage(dataDir + "sunspot.png");
-  // plageColor    = loadImage(dataDir + "plage.png");
+  // plageColor    = loadImage(dataDir + "plage.png"); // IN CASE OF PLAGE
 
-
+  arches = new PVector[12];
   // itsybitsies[0]
-  arches[0] = new PVector(0, 7);
-  arches[1] = new PVector(width-1, 8);
+  arches[0] = new PVector(0, 12);
+  arches[1] = new PVector(width-1, 7);
 
   // itsybitsies[1]
-  arches[2] = new PVector(0, 11);
-  arches[3] = new PVector(width-1, 23);
+  arches[2] = new PVector(0, 25);
+  arches[3] = new PVector(width-1, 41);
 
   // itsybitsies[2]
-  arches[4] = new PVector(0, 27);
-  arches[5] = new PVector(width-1, 30);
+  arches[4] = new PVector(0, 46);
+  arches[5] = new PVector(width-1, 29);
 
   // itsybitsies[3]
-  arches[6] = new PVector(0, 64);
-  arches[7] = new PVector(width-1, 48);
+  arches[6] = new PVector(0, 62);
+  arches[7] = new PVector(width-1, 59);
 
   // itsybitsies[4]
-  arches[8] = new PVector(0, 43);
-  arches[9] = new PVector(width-1, 60);
+  arches[8] = new PVector(0, 78);
+  arches[9] = new PVector(width-1, 66);
 
   // itsybitsies[5]
-  arches[10] = new PVector(0, 77);
-  arches[11] = new PVector(width-1, 82);
+  arches[10] = new PVector(0, 82);
+  arches[11] = new PVector(width-1, 81);
 }
 
 
@@ -139,13 +140,14 @@ void makeItsyArray(){
   ports = new Serial[itsybitsies.length];
   for (int i = 0; i < ports.length; i++){
     ports[i] = new Serial(this, itsybitsies[i], 9600);
+	println(i);
   }
 }
 
 
 void serialEvent(Serial p){
   int received = p.read();
-  if (received == '1' && solarFeatures.size() < maxNumFeatures){
+  if (received == '1' && solarFeatures.size() < maxNumFeatures && random(1) < 0.005){
       //// 9 + (INDEX * 18)
       for (int i = 0; i < itsybitsies.length-1; i++){
         if (ports[i] == p){
