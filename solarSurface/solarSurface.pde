@@ -16,7 +16,7 @@ float noiseIncrement = 0.25;  /// CHANGE SIZE OF GRANUAL
 float zoff = 0.0;
 float xoffStart = 90.0;
 
-char[] archVisualizations = {'a'}; //// ADD MORE FOR DIFFERENT EFFECTS --- THESE ARE CHOSEN AT RANDOM IN THE 
+char[] archVisualizations = {'a'}; //// ADD MORE FOR DIFFERENT EFFECTS --- THESE ARE CHOSEN AT RANDOM IN THE
 
 
 OpenSimplexNoise noise;
@@ -31,16 +31,20 @@ String[] itsybitsies;
 
 void settings(){
   size(canvasWidth, canvasHeight);
+
 }
 
 void setup(){
 
-  makeItsyArray();
+  noStroke();
+  blendMode(MULTIPLY);
 
+  //// OPC SERVER NEEDS TO RUN FOR FADECANDIES TO WORK
   opc = new OPC(this, "127.0.0.1", 7890);  // Connect to the local instance of fcserver
   opc.ledGrid(0, 54, 90, width/2, height/2, width/width, height/height, 0, false, true); // Create LED Grid
 
-  noStroke();
+  //// BUILD ARRAY OF MOUNTED ARDUINOS --- GETS LIST FROM serials TEXT FILE
+  makeItsyArray();
 
   noise         = new OpenSimplexNoise();
   solarFeatures = new ArrayList<SolarFeature>();
@@ -48,6 +52,8 @@ void setup(){
   spotColor     = loadImage(dataDir + "sunspot.png");
   // plageColor    = loadImage(dataDir + "plage.png"); // IN CASE OF PLAGE
 
+
+ //// THESE ARE THE LOCATIONS OF EACH ARCH AND THIER CORRESPONDING ARDUINOS
   arches = new PVector[12];
   // itsybitsies[0]
   arches[0] = new PVector(0, 12);
@@ -72,6 +78,8 @@ void setup(){
   // itsybitsies[5]
   arches[10] = new PVector(0, 82);
   arches[11] = new PVector(width-1, 81);
+  /////////////////////////////////////////////////////////////////////////
+
 }
 
 

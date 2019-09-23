@@ -145,7 +145,7 @@ void SunRain(int Cooling, int Sparking, int SpeedDelay, int Mirror, int randNum)
   }
 
   // Step 4.  Convert heat to LED colors
-  Serial.println(randNum);
+  // Serial.println(randNum);
   for( int j = 0; j < NUM_LEDS/2; j++) {
     setPixelHeatColor(j+MIRROR-randNum, heat[j] );
     setPixelHeatColor(-randNum+MIRROR-j, heat[j] );
