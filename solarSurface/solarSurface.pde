@@ -87,6 +87,9 @@ void setup(){
 void draw() {
   drawSurface();
   drawFeatures();
+  if (solarFeatures.size() > 0){
+    println(solarFeatures.size());
+    }
 }
 
 
@@ -157,7 +160,7 @@ void serialEvent(Serial p){
   int received = p.read();
   if (received == '1' && solarFeatures.size() < maxNumFeatures && random(1) < 0.005){
       //// 9 + (INDEX * 18)
-      for (int i = 0; i < itsybitsies.length-1; i++){
+      for (int i = 0; i < ports.length; i++){
         if (ports[i] == p){
           //// 9 + (INDEX * 18)
           solarFeatures.add(new SolarFeature(round((width/2)+random(-5, 5)), 9 + (i*18), 0));
