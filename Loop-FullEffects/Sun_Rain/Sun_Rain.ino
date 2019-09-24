@@ -54,7 +54,7 @@ void loop()
 {
   // Listen to incoming serial communication from processing script //
 
-  // pickedIndex = random(100);
+  pickedIndex = random(100);
   // Serial.println(pickedIndex);
 
   // Check for incoming serial data
