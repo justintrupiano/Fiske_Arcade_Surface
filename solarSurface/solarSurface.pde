@@ -87,9 +87,7 @@ void setup(){
 void draw() {
   drawSurface();
   drawFeatures();
-  if (solarFeatures.size() > 0){
-    println(solarFeatures.size());
-    }
+  
 }
 
 
@@ -157,7 +155,11 @@ void makeItsyArray(){
 
 
 void serialEvent(Serial p){
-  int received = p.read();
+int serialStream = p.read();
+if (serialStream == 49){
+  println(serialStream);
+}
+  int received = serialStream;
   if (received == '1' && solarFeatures.size() < maxNumFeatures && random(1) < 0.005){
       //// 9 + (INDEX * 18)
       for (int i = 0; i < ports.length; i++){
