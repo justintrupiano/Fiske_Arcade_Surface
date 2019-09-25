@@ -25,7 +25,7 @@ int r = 100; // Red
 int delayval = 10; // delay time
 int j; // counter
 
-uint32_t period = 1 * 60000L; // # Minutes
+uint32_t period = 10000L; // Millis
 int randomVals[100]; // Array of values to pick from randomnly
 int pickedIndex; // Param for the picked integer
 
@@ -35,6 +35,8 @@ void setup()
   pinMode(SENSOR, INPUT); // Assign sensor to pin A2 as input
   strip.begin(); // Wake-up LED strip
   colorWipe(strip.Color(5, 5, 5), 0);
+
+  sensorToSerial();
   strip.show(); // Initialize all pixels to 'off'
   Keyboard.begin(); // Initialize control over keyboard//
 
@@ -50,8 +52,26 @@ void setup()
   }
 }
 
+/*
+  DO YOU WANT NEW SUNSPOTS?
+  Because this is how we get new sunspots:
+
+  This needs to run EVERY FRAME or the sensors wont make new spots.
+
+  sensorToSerial():
+    - Sends the sensor state to the serial stream.
+    - The processing script is listening for this...
+      ...and makes spots accordingly.
+
+*/
+void sensorToSerial(){
+  sensorState = digitalRead(SENSOR);
+  Serial.println(sensorState);
+}
+
 void loop()
 {
+
   // Listen to incoming serial communication from processing script //
 
   pickedIndex = random(100);
@@ -81,16 +101,7 @@ void loop()
    neutralState();
   }
 
-  sensorState = digitalRead(SENSOR);
-  Serial.println(sensorState);
 
-//  if (sensorState == '1' && sensorBlocked == false){
-//    Serial.println(sensorState);
-//    sensorBlocked = true;
-//  }
-//  else if(sensorState == 0 && sensorBlocked == true){
-//    sensorBlocked == false;
-//  }
 }
 
 // Global functions
@@ -98,18 +109,23 @@ void showStrip()
 {
 #ifdef ADAFRUIT_NEOPIXEL_H
   // NeoPixel
+
+  sensorToSerial();
   strip.show();
 #endif
 #ifndef ADAFRUIT_NEOPIXEL_H
   // FastLED
   FastLED.show();
 #endif
+
 }
 
 void colorWipe(uint32_t c, uint8_t wait)
 {
   for (uint16_t i = 0; i < strip.numPixels(); i++) {
     strip.setPixelColor(i, c);
+
+    sensorToSerial();
     strip.show();
     delay(wait);
   }
@@ -118,6 +134,7 @@ void colorWipe(uint32_t c, uint8_t wait)
 
 // Sun rain effect from the middle
 void SunRain(int Cooling, int Sparking, int SpeedDelay, int Mirror, int randNum) {
+
   static byte heat[NUM_LEDS];
   int cooldown;
 
@@ -205,6 +222,8 @@ void SolarFlare()
       strip.setPixelColor(i, strip.Color(0, 0, 0)); // Front to off
       strip.setPixelColor(j, strip.Color(0, 0, 0)); //Back to off
     }
+
+    sensorToSerial();
     strip.show();
     delay(delayval);
 
@@ -220,6 +239,8 @@ void SolarFlare()
 
       }
     }
+
+    sensorToSerial();
     strip.show();
     delay(75);
 
@@ -233,6 +254,8 @@ void SolarFlare()
       strip.setPixelColor(j, strip.Color(0, 0, 0)); //Back to off
 
     }
+
+    sensorToSerial();
     strip.show();
     delay(75);
 
@@ -253,6 +276,8 @@ void SolarFlare()
       strip.setPixelColor(j - Mid - 3, strip.Color(r, g / 2, b / 8));
       strip.setPixelColor(j - Mid - 4, strip.Color(r, g / 2, b / 8));
 
+
+      sensorToSerial();
       strip.show();
       //delay(delayval);
     }
@@ -289,6 +314,8 @@ void SolarFlare()
       strip.setPixelColor(j - Mid - 3, strip.Color(0, 0, 0));
       strip.setPixelColor(j - Mid - 4, strip.Color(0, 0, 0));
 
+
+      sensorToSerial();
       strip.show();
       //delay(delayval);
     }
@@ -303,18 +330,26 @@ void SolarFlare()
 
       strip.setPixelColor(i, strip.Color(r, g / 2, b / 8));
       strip.setPixelColor(j, strip.Color(r, g / 2, b / 8));
+
+      sensorToSerial();
       strip.show();
       //delay(delayval*10);
       strip.setPixelColor(i + 3, strip.Color(r, g / 2, b / 8));
       strip.setPixelColor(j + 2, strip.Color(r, g / 2, b / 8));
+
+      sensorToSerial();
       strip.show();
       //delay(delayval*10);
       strip.setPixelColor(i + 1, strip.Color(r, g / 2, b / 8));
       strip.setPixelColor(j + 1, strip.Color(r, g / 2, b / 8));
+
+      sensorToSerial();
       strip.show();
       //delay(delayval*10);
       strip.setPixelColor(i + 2, strip.Color(r, g / 2, b / 8));
       strip.setPixelColor(j + 3, strip.Color(r, g / 2, b / 8));
+
+      sensorToSerial();
       strip.show();
       //delay(delayval*10);
     }
@@ -339,6 +374,8 @@ void SolarFlare()
       strip.setPixelColor(j - 3, strip.Color(0, 0, 0)); //Back to off
       strip.setPixelColor(j - 4, strip.Color(0, 0, 0)); //Back to off
 
+
+      sensorToSerial();
       strip.show();
     }
 
@@ -355,6 +392,8 @@ void SolarFlare()
 
       }
     }
+
+    sensorToSerial();
     strip.show();
 
     delay(10);
@@ -365,6 +404,7 @@ void SolarFlare()
 // Neutral state; Yellow to red patterns
 void neutralState()
 {
+
     // Sets the gradient once
     for (int i = 0; i < (NUM_LEDS / 2) + 1; i++)
     {
@@ -379,6 +419,8 @@ void neutralState()
     strip.setPixelColor(j - Mid, strip.Color(r, g_gradient, 0)); //Back
 
   }
+
+  sensorToSerial();
   strip.show(); // This sends the updated pixel color to the hardware.
   //delay(delayval); // Delay for a period of time (in milliseconds).
 }
