@@ -87,16 +87,22 @@ void setup(){
 void draw() {
   drawSurface();
   drawFeatures();
+
+  if (random(1) > 0.995 && solarFeatures.size() < maxNumFeatures){
+	solarFeatures.add(new SolarFeature(round(width/2 + random(-5, 5)), round(random(0, height)), 0));
+}
+
   
 }
 
 
 void mousePressed(){
-    if (solarFeatures.size() < maxNumFeatures){
+  ports[3].write('a');
+    //if (solarFeatures.size() < maxNumFeatures){
       //// 0 == SPOT  /   1 == PLAGE
       // solarFeatures.add(new SolarFeature(mouseX, mouseY, 0));
-      solarFeatures.add(new SolarFeature(mouseX, mouseY, 0));
-  }
+      //solarFeatures.add(new SolarFeature(mouseX, mouseY, 0));
+  //}
 }
 
 
@@ -160,12 +166,13 @@ if (serialStream == 49){
   println(serialStream);
 }
   int received = serialStream;
-  if (received == '1' && solarFeatures.size() < maxNumFeatures && random(1) < 0.005){
+  if (received == '1' && solarFeatures.size() < maxNumFeatures && random(100) > 99.8){
       //// 9 + (INDEX * 18)
       for (int i = 0; i < ports.length; i++){
-        if (ports[i] == p){
+        if (ports[i] == p && i != 3){
           //// 9 + (INDEX * 18)
           solarFeatures.add(new SolarFeature(round((width/2)+random(-5, 5)), 9 + (i*18), 0));
+          received = 0;
           break;
         }
       }
