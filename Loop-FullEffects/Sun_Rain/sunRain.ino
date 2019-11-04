@@ -109,10 +109,8 @@ void serialFlush(){
 
 void loop()
 {
-  // Listen to incoming serial communication from processing script //
-  sensorToSerial();
+
   pickedIndex = random(100);
-  // Serial.println(pickedIndex);
   // Check for incoming serial data
   if (Serial.available() > 0)
   {
@@ -125,7 +123,6 @@ void loop()
        // For # amount of time, run Sun Rain effect.
        for( uint32_t tStart = millis();  (millis()-tStart) < period;  )
        {
-        sensorToSerial();
          SunRain(55,120,15,1,randomVals[pickedIndex]);
        }
     }
