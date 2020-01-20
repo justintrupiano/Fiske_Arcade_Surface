@@ -166,7 +166,7 @@ if (serialStream == 49){
   println(serialStream);
 }
   int received = serialStream;
-  if (received == '1' && solarFeatures.size() < maxNumFeatures && random(100) > 99.8){
+  if (received == 49 && solarFeatures.size() < maxNumFeatures && random(100) > 75.8){
       //// 9 + (INDEX * 18)
       for (int i = 0; i < ports.length; i++){
         if (ports[i] == p && i != 3){

@@ -108,7 +108,7 @@ class SolarFeature{
     if (dist(pos.x, pos.y, dest.x, dest.y) < 2 && age < lifeSpan && !sentFlare){
 
       //// ONLY TRIGGER EFFECT IF THE ITSY IS IN THE PORTS ARRAY
-      if (floor(destArch/2) <= ports.length/2){
+      if (floor(destArch/4) <= ports.length/2){
             ports[floor(destArch/2)].write(chosenViz);
 
       //// sentFlare ENSURES SPOTS WILL ONLY SEND 1 FLARE
