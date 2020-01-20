@@ -1,5 +1,5 @@
 /*\
-|*| Author: 
+|*| Author:
 |*|   Juan Molina
 |*|   Fiske Planetarium
 |*|   jamolinaescalante@gmail.com
@@ -63,7 +63,7 @@ unsigned int lastTime = 0;
 // standard nepixel strip of 360 LEDs
 Adafruit_NeoPixel * strip = new Adafruit_NeoPixel(STRIPSIZE, PIN, NEO_GRB + NEO_KHZ800);
 // arduino logic initialization
-void setup() 
+void setup()
 {
   Serial.begin(9600); // Initialize console
   Keyboard.begin(); // Initialize control over keyboard//
@@ -71,7 +71,7 @@ void setup()
   pinMode(SENSOR, INPUT); // Assign sensor to pin A2 as input
   strip->begin();
   colorWipe(strip->Color(5, 5, 5), 0);
-  sensorToSerial();
+  // sensorToSerial();
   strip->show(); // Initialize all pixels to 'off'
   // fill array with values
   for (int i=0; i<50; i++)
@@ -102,16 +102,15 @@ void serialFlush(){
   while (Serial.available() > 0){
     char t = Serial.read();
     }
-  
+
   }
 
 
 
 void loop()
 {
-  // Listen to incoming serial communication from processing script //
+
   pickedIndex = random(100);
-  // Serial.println(pickedIndex);
   // Check for incoming serial data
   if (Serial.available() > 0)
   {
@@ -124,7 +123,6 @@ void loop()
        // For # amount of time, run Sun Rain effect.
        for( uint32_t tStart = millis();  (millis()-tStart) < period;  )
        {
-        sensorToSerial();
          SunRain(55,120,15,1,randomVals[pickedIndex]);
        }
     }
@@ -137,7 +135,7 @@ void loop()
   }
 }
 /********FLAMES EFFECT*******/
-void flames() 
+void flames()
 {
   unsigned int time = millis();
   //Serial.println(1000/(time - lastTime));
@@ -151,11 +149,10 @@ void flames()
     //Used to avoid a linear effect and give a more natural curve.
     float v = QuadraticEaseInOut(n/255);
     float vi = QuadraticEaseInOut(ni/255);
-    
+
     vi = (MAX_INTENSITY - MIN_INTENSITY) * v + MIN_INTENSITY;
     float red = vi *(RED*v);
     float yellow = vi *((MAX_VARIATION - MIN_VARIATION)*v + MIN_VARIATION);
-    sensorToSerial();
     leds[i] = CRGB(red , yellow , 0);
   }
   sensorToSerial();
@@ -242,7 +239,7 @@ void SunRain(int Cooling, int Sparking, int SpeedDelay, int Mirror, int randNum)
     setPixelHeatColor(j+MIRROR-randNum, heat[j] );
     setPixelHeatColor(-randNum+MIRROR-j, heat[j] );
     }
-    sensorToSerial();  
+  sensorToSerial();
 //  serialFlush();
   showStrip();
   delay(SpeedDelay);
