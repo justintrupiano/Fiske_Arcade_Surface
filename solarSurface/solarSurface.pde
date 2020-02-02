@@ -163,9 +163,9 @@ void makeItsyArray(){
 
 void serialEvent(Serial p){
 int serialStream = p.read();
-if (serialStream == 49){
+// if (serialStream == 49){
   println(serialStream);
-}
+// }
   int received = serialStream;
   if (received == 49 && solarFeatures.size() < maxNumFeatures && random(100) > 75.8){
       //// 9 + (INDEX * 18)
