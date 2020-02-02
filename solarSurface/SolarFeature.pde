@@ -16,7 +16,7 @@ class SolarFeature{
   int     insideOpacity = 178;
 
 //// NUM OF SECONDS * FPS TO KEEP FEATURE AT MAX OPACITY (ASSUMING ~60FPS)
-  float   lifeSpan = 200;
+  float   lifeSpan;
   float   currentSize = 0;
   float   maxSize = random(canvasWidth*0.01, canvasWidth*0.2);  //// MAX SIZE OF FEATURE (10% OF CANVAS WIDTH)
   float   perlinSeed = random(100);
@@ -32,6 +32,8 @@ class SolarFeature{
   char chosenViz = archVisualizations[round(random(0, archVisualizations.length-1))];
 
   SolarFeature(int x, int y, int type, boolean m){
+
+    lifeSpan = random(200, 300);
     move = m;
     pos.x = x;
     pos.y = y;
