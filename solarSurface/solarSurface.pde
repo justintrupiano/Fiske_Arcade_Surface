@@ -110,10 +110,10 @@ void mousePressed(){
 void drawFeatures(){
   if (solarFeatures.size() > 0){
     for (int i = 0; i < solarFeatures.size(); i++){
-      if (solarFeatures.get(i).type == 0) {
+      // if (solarFeatures.get(i).type == 0) {
         solarFeatures.get(i).show();
         solarFeatures.get(i).update();
-      }
+      // }
   }
     for (int i = 0; i < solarFeatures.size(); i++){
       if (solarFeatures.get(i).currentSize < 0){
