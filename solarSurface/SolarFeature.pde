@@ -34,6 +34,9 @@ class SolarFeature{
   SolarFeature(int x, int y, int type, boolean m){
 
     lifeSpan = random(200, 300);
+    if (!m){
+      lifeSpan = random(10000, 12000)
+    }
     move = m;
     pos.x = x;
     pos.y = y;
