@@ -16,7 +16,7 @@ class SolarFeature{
   int     insideOpacity = 178;
 
 //// NUM OF SECONDS * FPS TO KEEP FEATURE AT MAX OPACITY (ASSUMING ~60FPS)
-  float   lifeSpan = 5 * frameRate;
+  float   lifeSpan = 200;
   float   currentSize = 0;
   float   maxSize = random(canvasWidth*0.01, canvasWidth*0.2);  //// MAX SIZE OF FEATURE (10% OF CANVAS WIDTH)
   float   perlinSeed = random(100);

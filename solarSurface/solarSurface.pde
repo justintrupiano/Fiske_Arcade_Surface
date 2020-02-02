@@ -10,7 +10,7 @@ PImage spotColor;
 
 int canvasWidth   = 55; //// 55
 int canvasHeight  = 91; //// 91
-int maxNumFeatures = 100;
+int maxNumFeatures = 50;
 
 float noiseIncrement = 0.25;  /// CHANGE SIZE OF GRANUAL
 float zoff = 0.0;
