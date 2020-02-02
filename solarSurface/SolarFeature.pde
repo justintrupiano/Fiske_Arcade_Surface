@@ -35,7 +35,7 @@ class SolarFeature{
 
     lifeSpan = random(200, 300);
     if (!m){
-      lifeSpan = random(10000, 12000)
+      lifeSpan = random(10000, 12000);
     }
     move = m;
     pos.x = x;

@@ -92,7 +92,7 @@ void draw() {
   if (solarFeatures.size() == 0){
     showArchLocations();
   }
-  if (random(1) > 0.95 && solarFeatures.size() < 12){
+  if (random(1) > 0.95 && solarFeatures.size() < 15){
       showArchLocations();
     }
 
