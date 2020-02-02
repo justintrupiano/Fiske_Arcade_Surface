@@ -88,11 +88,12 @@ void draw() {
   drawSurface();
   drawFeatures();
 
-  if (random(1) > 0.995 && solarFeatures.size() < maxNumFeatures){
-	solarFeatures.add(new SolarFeature(round(width/2 + random(-5, 5)), round(random(0, height)), 0));
-}
+  //// Draw spots if not in use.
+  if (random(1) > 0.95 && solarFeatures.size() == 0){
+	   solarFeatures.add(new SolarFeature(round(width/2 + random(-5, 5)), round(random(0, height)), 0));
+  }
 
-  
+
 }
 
 
@@ -169,7 +170,7 @@ if (serialStream == 49){
   if (received == 49 && solarFeatures.size() < maxNumFeatures && random(100) > 75.8){
       //// 9 + (INDEX * 18)
       for (int i = 0; i < ports.length; i++){
-        if (ports[i] == p && i != 3){
+        if (ports[i] == p){
           //// 9 + (INDEX * 18)
           solarFeatures.add(new SolarFeature(round((width/2)+random(-5, 5)), 9 + (i*18), 0));
           received = 0;
