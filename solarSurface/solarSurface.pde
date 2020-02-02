@@ -93,7 +93,7 @@ void draw() {
     showArchLocations(); /// SHOULD BE CALL MAKE-SPOT-AT-ARCH
   }
 
-  if (second() == 0 || second() == 30 && random(100) > 99.8){
+  if (random(100) > 99.99){
       solarFeatures.add(new SolarFeature(round(width/2 + random(-5, 5)), round(random(0, height)), 0, true));
   }
 
