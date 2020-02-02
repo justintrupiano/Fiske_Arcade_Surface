@@ -29,12 +29,15 @@ PImage solarSurface;
 PImage spotColor;
 
 int canvasWidth   = 55; //// 55
-int canvasHeight  = 91; //// 19
+int canvasHeight  = 91; //// 91
 int maxNumFeatures = 50;
 
 float noiseIncrement = 0.25f;  /// CHANGE SIZE OF GRANUAL
 float zoff = 0.0f;
 float xoffStart = 90.0f;
+
+char[] archVisualizations = {'a'}; //// ADD MORE FOR DIFFERENT EFFECTS --- THESE ARE CHOSEN AT RANDOM IN THE
+
 
 OpenSimplexNoise noise;
 
@@ -42,91 +45,105 @@ OpenSimplexNoise noise;
 
 ArrayList<SolarFeature> solarFeatures;
 
-PVector[] arches = new PVector[12];
-
+PVector[] arches;
 String[] itsybitsies;
-
 
 
 public void settings(){
   size(canvasWidth, canvasHeight);
+
 }
 
 public void setup(){
-  makeItsyArray();
-
-  ports = new Serial[itsybitsies.length];
-  for (int i = 0; i < ports.length; i++){
-    ports[i] = new Serial(this, itsybitsies[i], 9600);
-  }
-  opc = new OPC(this, "127.0.0.1", 7890);  // Connect to the local instance of fcserver
-  opc.ledGrid(0, 54, 90, width/2, height/2, width/width, height/height, 0, false, false); // Create LED Grid
 
   noStroke();
+  blendMode(MULTIPLY);
+
+  //// OPC SERVER NEEDS TO RUN FOR FADECANDIES TO WORK
+  opc = new OPC(this, "127.0.0.1", 7890);  // Connect to the local instance of fcserver
+  opc.ledGrid(0, 54, 90, width/2, height/2, width/width, height/height, 0, false, true); // Create LED Grid
+
+  //// BUILD ARRAY OF MOUNTED ARDUINOS --- GETS LIST FROM serials TEXT FILE
+  makeItsyArray();
 
   noise         = new OpenSimplexNoise();
   solarFeatures = new ArrayList<SolarFeature>();
   solarSurface  = loadImage(dataDir + "solarSurface.png");
   spotColor     = loadImage(dataDir + "sunspot.png");
-  // plageColor    = loadImage(dataDir + "plage.png");
+  // plageColor    = loadImage(dataDir + "plage.png"); // IN CASE OF PLAGE
 
 
-  arches[0] = new PVector(0, 0);
-  arches[1] = new PVector(width, 0);
+ //// THESE ARE THE LOCATIONS OF EACH ARCH AND THIER CORRESPONDING ARDUINOS
+  arches = new PVector[12];
+  // itsybitsies[0]
+  arches[0] = new PVector(0, 12);
+  arches[1] = new PVector(width-1, 7);
 
-  arches[2] = new PVector(0, height*0.18f);
-  arches[3] = new PVector(width, height*0.18f);
+  // itsybitsies[1]
+  arches[2] = new PVector(0, 25);
+  arches[3] = new PVector(width-1, 41);
 
-  arches[4] = new PVector(0, height*0.36f);
-  arches[5] = new PVector(width, height*0.36f);
+  // itsybitsies[2]
+  arches[4] = new PVector(0, 46);
+  arches[5] = new PVector(width-1, 29);
 
-  arches[6] = new PVector(0, height*0.54f);
-  arches[7] = new PVector(width, height*0.54f);
+  // itsybitsies[3]
+  arches[6] = new PVector(0, 62);
+  arches[7] = new PVector(width-1, 59);
 
-  arches[8] = new PVector(0, height*0.72f);
-  arches[9] = new PVector(width, height*0.72f);
+  // itsybitsies[4]
+  arches[8] = new PVector(0, 78);
+  arches[9] = new PVector(width-1, 66);
 
-  arches[10] = new PVector(0, height);
-  arches[11] = new PVector(width, height);
+  // itsybitsies[5]
+  arches[10] = new PVector(0, 82);
+  arches[11] = new PVector(width-1, 81);
+  /////////////////////////////////////////////////////////////////////////
 
 }
 
+
+
 public void draw() {
-  makeItsyArray();
   drawSurface();
   drawFeatures();
+
+  //// Draw spots if not in use.
+  if (solarFeatures.size() == 0){
+    showArchLocations();
+  }
+  if (random(1) > 0.95f && solarFeatures.size() < 12){
+      showArchLocations();
+    }
+
+
+
 }
 
 
 public void mousePressed(){
-    if (solarFeatures.size() < maxNumFeatures){
+  ports[3].write('a');
+    //if (solarFeatures.size() < maxNumFeatures){
       //// 0 == SPOT  /   1 == PLAGE
       // solarFeatures.add(new SolarFeature(mouseX, mouseY, 0));
-      solarFeatures.add(new SolarFeature(mouseX, mouseY, 0));
-  }
+      //solarFeatures.add(new SolarFeature(mouseX, mouseY, 0));
+  //}
 }
 
 
 public void drawFeatures(){
   if (solarFeatures.size() > 0){
     for (int i = 0; i < solarFeatures.size(); i++){
-
-    if (solarFeatures.get(i).type == 0) {
-      solarFeatures.get(i).show();
-      solarFeatures.get(i).update();
-    }
-    // else if (solarFeatures.get(i).type == 1) {
-    //
-    // }
-    }
-
+      // if (solarFeatures.get(i).type == 0) {
+        solarFeatures.get(i).show();
+        solarFeatures.get(i).update();
+      // }
+  }
     for (int i = 0; i < solarFeatures.size(); i++){
-
       if (solarFeatures.get(i).currentSize < 0){
         solarFeatures.remove(i);  //// REMOVE OLDER SUN SPOTS
       }
-  }
-
+    }
   }
 }
 
@@ -147,17 +164,10 @@ public void drawSurface(){
 
       int colorPos;
       PImage colorField;
-
-      // if (dist(x,y, x, height/2) < 10){
-      //   colorField = plageColor;
-      // }
-      // else{
-        colorField = solarSurface;
-      // }
+      colorField = solarSurface;
 
       colorPos = round(map(n, -1, 1, 0, colorField.width));
       pixels[x+y*width] = color(colorField.get(colorPos, 0));
-
     }
   }
   updatePixels();
@@ -170,24 +180,36 @@ public void makeItsyArray(){
   ports = new Serial[itsybitsies.length];
   for (int i = 0; i < ports.length; i++){
     ports[i] = new Serial(this, itsybitsies[i], 9600);
+	println(i);
   }
 }
 
+
 public void serialEvent(Serial p){
-  int received = p.read();
-  if (received == '1' && solarFeatures.size() < maxNumFeatures){
+int serialStream = p.read();
+// if (serialStream == 49){
+  println(serialStream);
+// }
+  int received = serialStream;
+  if (received == 49 && solarFeatures.size() < maxNumFeatures && random(100) > 75.8f){
       //// 9 + (INDEX * 18)
-      for (int i = 0; i < itsybitsies.length; i++){
+      for (int i = 0; i < ports.length; i++){
         if (ports[i] == p){
           //// 9 + (INDEX * 18)
-          solarFeatures.add(new SolarFeature(round((width/2)+random(-5, 5)), 9 + (i*18), 0));
+          solarFeatures.add(new SolarFeature(round((width/2)+random(-5, 5)), 9 + (i*18), 0, true));
+          received = 0;
           break;
         }
       }
   }
+}
 
 
+public void showArchLocations(){
+  for (int a = 0; a < arches.length; a++){
+    solarFeatures.add(new SolarFeature((int)arches[a].x, (int)arches[a].y, 0, false));
 
+  }
 }
 /*
  * Simple Open Pixel Control client for Processing,
@@ -572,27 +594,32 @@ class SolarFeature{
   int     destArch = round(random(0, 11));
 
   int     type;
-  int     age = 0;                          //// CURRENT LIFETIME OF THIS FEATURE (IN FPS)
-  int     outsideOpacity = 64;
-  int     insideOpacity = 200;
 
-  float   lifeSpan = 10 * frameRate;       //// NUM OF SECONDS * FPS TO KEEP FEATURE AT MAX OPACITY (ASSUMING ~60FPS)
+  //// CURRENT LIFETIME OF THIS FEATURE (IN FPS)
+  int     age = 0;
+  int     outsideOpacity = 64;
+  int     insideOpacity = 178;
+
+//// NUM OF SECONDS * FPS TO KEEP FEATURE AT MAX OPACITY (ASSUMING ~60FPS)
+  float   lifeSpan = 200;
   float   currentSize = 0;
   float   maxSize = random(canvasWidth*0.01f, canvasWidth*0.2f);  //// MAX SIZE OF FEATURE (10% OF CANVAS WIDTH)
   float   perlinSeed = random(100);
   float   increment;
-  float   flux = 0.75f;
+  float   flux = 0.5f;
 
   boolean maxed = false;
+  boolean sentFlare = false;
+  boolean move;
 
   int   featureColor;
 
+  char chosenViz = archVisualizations[round(random(0, archVisualizations.length-1))];
 
-
-  SolarFeature(int x, int y, int type){
+  SolarFeature(int x, int y, int type, boolean m){
+    move = m;
     pos.x = x;
     pos.y = y;
-
 
     if (type == 0){
       makeSpotShape();
@@ -605,32 +632,43 @@ class SolarFeature{
   }
 
   public void makeSpotShape(){
-    perlinSeed += 0.025f;                                  //// SPEED OF FLUX WITHIN FEATURE
+    //// SPEED OF FLUX WITHIN FEATURE
+    perlinSeed += 0.025f;
+
+    //// SHAPE CONSISTS OF TWO RANDOMLY GENERATED SHAPES
     outsideShape = createShape();
     outsideShape.beginShape();
     insideShape = createShape();
     insideShape.beginShape();
+
+    /*
+    / INCREMENT IS THE RATE AT WHICH A FEATURE GROWS AND SHRINKS
+    / MAX SIZE IS ASSIGNED FOR EACH FEATURE AS A RANDOM NUMBER canvasWidth*0.01, canvasWidth*0.2
+    */
     increment = random(maxSize*0.001f, maxSize*0.03f);
 
+    //// SMALLER v INCREMENT == MORE VERTICES IN CIRCLE
     for (float v = 0; v < TWO_PI; v+=0.025f){
-        float xoff = map(cos(v)+perlinSeed, -1, 1, 1, 3); //// JAGGEDNESS OF EDGES (HIGHER = MORE JAGGED)
-        float yoff = map(sin(v)+perlinSeed, -1, 1, 1, 3); //// JAGGEDNESS OF EDGES (HIGHER = MORE JAGGED)
+        float xoff = map(cos(v)+perlinSeed, -1, 1, 1, 5);
+        float yoff = map(sin(v)+perlinSeed, -1, 1, 1, 5);
 
-        //// MOVING THROUGH NOISE SPACE:
-        float n = map((float) (noise .eval(xoff, yoff)), -1, 1, 0, 1);
+        //// MOVING THROUGH NOISE-SPACE:
+        //// HIGHER n == MORE JAGGED SHAPE
+        float n = map((float)(noise.eval(xoff, yoff)), -1, 1, 0, 4);
         float r = map(n, -1, 1, currentSize - flux, currentSize);
-
         float vX = r * cos(v);
         float vY = r * sin(v);
 
+        //// ADD NEW VERTEX WITH NOISE-SPACE VALUES
         outsideShape.vertex(vX, vY);
         insideShape.vertex(vX, vY);
 
     }
 
+
     outsideShape.endShape(CLOSE);
     insideShape.endShape(CLOSE);
-    insideShape.scale(0.5f);
+    insideShape.scale(0.75f);
 
     outsideShape.setFill(color(46, 1, 4, outsideOpacity));
     insideShape.setFill(color(46, 1, 4, insideOpacity));
@@ -640,53 +678,57 @@ class SolarFeature{
 
 
   public void showSpots(){
-    // pushMatrix();
-      // translate(pos.x, pos.y);  //// PLACE UNDER MOUSE (OR WHEREVER pos.x/pos.y HAS BEEN SET)
-      shape(outsideShape, pos.x, pos.y);
-      shape(insideShape, pos.x, pos.y);
-    // popMatrix();
-
-
-
+    //// MAKE SHAPE USING THE DEFINED VERTICIES
+    shape(outsideShape, pos.x, pos.y);
+    shape(insideShape, pos.x, pos.y);
   }
 
-  int count = 0;
+
 
   public void moveSpot(){
-    //
 
-
-    //   ///// MOVE TOWARD DEST
+    ///// MOVE TOWARD DEST
     PVector dest = new PVector();
     dest = arches[destArch].copy();
-    if (dist(pos.x, pos.y, dest.x, dest.y) < 10){
 
-      //println(count++);
-      // acc.add(PVector.random2D().mult(0.075));
+    //// CHECK IF SPOT IS NEAR ITS DESTINATION ARCH
+    if (dist(pos.x, pos.y, dest.x, dest.y) < 2 && age < lifeSpan && !sentFlare){
 
+      //// ONLY TRIGGER EFFECT IF THE ITSY IS IN THE PORTS ARRAY
+      if (floor(destArch/4) <= ports.length/2){
+            ports[floor(destArch/2)].write(chosenViz);
+
+      //// sentFlare ENSURES SPOTS WILL ONLY SEND 1 FLARE
+  	  sentFlare = true;
+
+    	}
     }
 
 
+
+    /*
+      THE SPOTS MOVE IN A DIRECTION WHICH IS SLIGHTLY RANDOM...
+      ...AND SLIGHTLY GUIDED IN THE DIRECTION OF THEIR SPECIFIC GOAL.
+    */
     dest.sub(pos);
     dest.setMag(0.001f);
     acc = dest;
 
-    // vel = new PVector(0, 0);
-    // acc = new PVector(0, 0);
-    acc.add(PVector.random2D().mult(0.005f));
+    //// RANDOM MOVEMENT OF SPOTS
+    acc.add(PVector.random2D().mult(0.0025f));
     vel.add(acc);
     pos.add(vel);
-
-
-
-
-
   }
 
 
   public void update(){
-    makeSpotShape(); //// MAKE NEW SHAPE WITH SLIGHTLY DIFFERENT VERTS (CREATES THE FLUX EFFECT)
-    moveSpot();
+
+    //// MAKE NEW SHAPE WITH SLIGHTLY DIFFERENT VERTS (CREATES THE FLUX EFFECT)
+    makeSpotShape();
+
+    if (move){
+      moveSpot();
+    }
 
     if (currentSize < maxSize && maxed == false){
       currentSize += increment;
@@ -702,10 +744,6 @@ class SolarFeature{
     if (age > lifeSpan){
       currentSize -= increment;
     }
-
-
-
-
   }
 }
   static public void main(String[] passedArgs) {

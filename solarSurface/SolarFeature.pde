@@ -25,12 +25,14 @@ class SolarFeature{
 
   boolean maxed = false;
   boolean sentFlare = false;
+  boolean move;
 
   color   featureColor;
 
   char chosenViz = archVisualizations[round(random(0, archVisualizations.length-1))];
 
-  SolarFeature(int x, int y, int type){
+  SolarFeature(int x, int y, int type, boolean m){
+    move = m;
     pos.x = x;
     pos.y = y;
 
@@ -138,7 +140,10 @@ class SolarFeature{
 
     //// MAKE NEW SHAPE WITH SLIGHTLY DIFFERENT VERTS (CREATES THE FLUX EFFECT)
     makeSpotShape();
-    moveSpot();
+
+    if (move){
+      moveSpot();
+    }
 
     if (currentSize < maxSize && maxed == false){
       currentSize += increment;

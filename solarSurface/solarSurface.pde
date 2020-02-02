@@ -89,9 +89,13 @@ void draw() {
   drawFeatures();
 
   //// Draw spots if not in use.
-  if (random(1) > 0.95 && solarFeatures.size() == 0){
-	   solarFeatures.add(new SolarFeature(round(width/2 + random(-5, 5)), round(random(0, height)), 0));
+  if (solarFeatures.size() == 0){
+    showArchLocations();
   }
+  if (random(1) > 0.95 && solarFeatures.size() < 12){
+      showArchLocations();
+    }
+
 
 
 }
@@ -172,7 +176,7 @@ int serialStream = p.read();
       for (int i = 0; i < ports.length; i++){
         if (ports[i] == p){
           //// 9 + (INDEX * 18)
-          solarFeatures.add(new SolarFeature(round((width/2)+random(-5, 5)), 9 + (i*18), 0));
+          solarFeatures.add(new SolarFeature(round((width/2)+random(-5, 5)), 9 + (i*18), 0, true));
           received = 0;
           break;
         }
@@ -183,7 +187,7 @@ int serialStream = p.read();
 
 void showArchLocations(){
   for (int a = 0; a < arches.length; a++){
-    fill(map(a, 0, arches.length, 0, 255));
-    ellipse(arches[a].x, arches[a].y, 10, 10);
+    solarFeatures.add(new SolarFeature((int)arches[a].x, (int)arches[a].y, 0, false));
+
   }
 }
