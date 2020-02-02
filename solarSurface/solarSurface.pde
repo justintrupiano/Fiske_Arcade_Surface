@@ -89,13 +89,12 @@ void draw() {
   drawFeatures();
 
   //// Draw spots if not in use.
-  if (solarFeatures.size() == 0){
+  if (solarFeatures.size() < 5){
     showArchLocations(); /// SHOULD BE CALL MAKE-SPOT-AT-ARCH
   }
-  if (second() % 10 == 0){
-      for (int i = 0; i < 3; i++){
-        solarFeatures.add(new SolarFeature(round(width/2 + random(-5, 5)), round(random(0, height)), 0, true));
-      }
+
+  if (second() == 0 || second() == 30){
+      solarFeatures.add(new SolarFeature(round(width/2 + random(-5, 5)), round(random(0, height)), 0, true));
   }
 
 
