@@ -85,13 +85,6 @@ void setup(){
 
 
 void draw() {
-
-  if (second() == 0){
-    for (int i = 0; i < 64; i++){
-      ports[0].write('a');
-    }
-  }
-
   drawSurface();
   drawFeatures();
 

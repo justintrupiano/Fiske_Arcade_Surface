@@ -240,7 +240,7 @@ void SunRain(int Cooling, int Sparking, int SpeedDelay, int Mirror, int randNum)
     setPixelHeatColor(-randNum+MIRROR-j, heat[j] );
     }
   sensorToSerial();
-//  serialFlush();
+  serialFlush();
   showStrip();
   delay(SpeedDelay);
 }
